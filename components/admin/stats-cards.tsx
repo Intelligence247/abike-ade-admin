@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Users, Building, CreditCard, TrendingUp } from 'lucide-react'
+import { Users, Building, CreditCard, TrendingUp, MessageSquare, Image, Settings, Bell } from 'lucide-react'
 import { useAdmin } from './admin-provider'
 import { Skeleton } from '@/components/ui/skeleton'
+import Link from 'next/link'
 
 interface StatsData {
   totalUsers: number
@@ -13,6 +14,9 @@ interface StatsData {
   totalRevenue: number
   availableRooms: number
   occupiedRooms: number
+  totalMessages: number
+  totalNotifications: number
+  totalGalleryImages: number
 }
 
 export function StatsCards() {
@@ -34,6 +38,9 @@ export function StatsCards() {
         let totalRevenue = 0
         let availableRooms = 0
         let occupiedRooms = 0
+        let totalMessages = 0
+        let totalNotifications = 0
+        let totalGalleryImages = 0
 
         // Fetch users count
         admin.user.userList({
@@ -74,14 +81,44 @@ export function StatsCards() {
                                   }, 0)
                                 }
                                 
-                                // Update stats
-                                setStats({
-                                  totalUsers,
-                                  totalRooms,
-                                  totalTransactions,
-                                  totalRevenue,
-                                  availableRooms,
-                                  occupiedRooms
+                                // Fetch gallery images count
+                                admin.gallery.imageList({
+                                  params: { per_page: 1 },
+                                  onSuccess: (galleryData: any) => {
+                                    if (galleryData.status === 'success') {
+                                      totalGalleryImages = galleryData.total_items || 0
+                                      
+                                      // Update stats
+                                      setStats({
+                                        totalUsers,
+                                        totalRooms,
+                                        totalTransactions,
+                                        totalRevenue,
+                                        availableRooms,
+                                        occupiedRooms,
+                                        totalMessages,
+                                        totalNotifications,
+                                        totalGalleryImages
+                                      })
+                                      setLoading(false)
+                                    }
+                                  },
+                                  onError: (error: any) => {
+                                    console.error('Error fetching gallery images:', error)
+                                    // Update stats without gallery count
+                                    setStats({
+                                      totalUsers,
+                                      totalRooms,
+                                      totalTransactions,
+                                      totalRevenue,
+                                      availableRooms,
+                                      occupiedRooms,
+                                      totalMessages,
+                                      totalNotifications,
+                                      totalGalleryImages
+                                    })
+                                    setLoading(false)
+                                  }
                                 })
                                 setLoading(false)
                               }
@@ -184,54 +221,65 @@ export function StatsCards() {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-          <Users className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.totalUsers}</div>
-          <p className="text-xs text-muted-foreground">
-            Registered users
-          </p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Rooms</CardTitle>
-          <Building className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.totalRooms}</div>
-          <p className="text-xs text-muted-foreground">
-            {stats.availableRooms} available, {stats.occupiedRooms} occupied
-          </p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Transactions</CardTitle>
-          <CreditCard className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.totalTransactions}</div>
-          <p className="text-xs text-muted-foreground">
-            Payment transactions
-          </p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-          <TrendingUp className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">₦{stats.totalRevenue.toLocaleString()}</div>
-          <p className="text-xs text-muted-foreground">
-            From successful payments
-          </p>
-        </CardContent>
-      </Card>
+      <Link href="/admin/users">
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalUsers}</div>
+            <p className="text-xs text-muted-foreground">
+              Registered users
+            </p>
+          </CardContent>
+        </Card>
+      </Link>
+      
+      <Link href="/admin/rooms">
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Rooms</CardTitle>
+            <Building className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalRooms}</div>
+            <p className="text-xs text-muted-foreground">
+              {stats.availableRooms} available, {stats.occupiedRooms} occupied
+            </p>
+          </CardContent>
+        </Card>
+      </Link>
+      
+      <Link href="/admin/transactions">
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Transactions</CardTitle>
+            <CreditCard className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalTransactions}</div>
+            <p className="text-xs text-muted-foreground">
+              Payment transactions
+            </p>
+          </CardContent>
+        </Card>
+      </Link>
+      
+      <Link href="/admin/transactions">
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">₦{stats.totalRevenue.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">
+              From successful payments
+            </p>
+          </CardContent>
+        </Card>
+      </Link>
     </div>
   )
 }

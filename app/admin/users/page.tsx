@@ -42,6 +42,17 @@ export default function UsersPage() {
           sort_by: 'first_name'
         },
         onSuccess: (data) => {
+          console.log('User list API response:', data)
+          console.log('Users data:', data.data)
+          console.log('Verification statuses:', data.data?.map((u: any) => ({
+            id: u.id,
+            verified: u.verified,
+            user_verified: u.user?.verified,
+            is_verified: u.is_verified,
+            verification_status: u.verification_status,
+            name: `${u.first_name} ${u.last_name}`
+          })))
+
           setUsers(data.data || [])
           setCurrentPage(data.page_number || 1)
           setTotalPages(data.total_pages || 1)
@@ -78,16 +89,23 @@ export default function UsersPage() {
   const handleUserAction = async (userId: number, action: 'activate' | 'deactivate' | 'verify' | 'verifyAgreement') => {
     try {
       if (action === 'verify') {
+        console.log('Verifying user:', userId)
         admin.user.verify({
           formData: { user_id: userId },
-          onSuccess: () => {
+          onSuccess: (data) => {
+            console.log('Verify API response:', data)
             toast({
               title: "Success",
               description: "User verified successfully",
             })
-            fetchUsers(currentPage, searchTerm)
+            // Force refresh the user data to get updated verification status
+            setTimeout(() => {
+              console.log('Refreshing user data after verification')
+              fetchUsers(currentPage, searchTerm)
+            }, 500)
           },
           onError: (error) => {
+            console.error('Verify API error:', error)
             toast({
               title: "Error",
               description: error.message || "Failed to verify user",
@@ -186,7 +204,7 @@ export default function UsersPage() {
           </div>
           {user.agreement && (
             <Badge variant="outline" className="text-xs">
-              Agreement: {user.agreement_verified ? 'Verified' : 'Pending'}
+              Agreement: {process.env.NEXT_PUBLIC_API_URL + "" + user.agreement_verified ? 'Verified' : 'Pending'}
             </Badge>
           )}
         </div>
@@ -238,7 +256,7 @@ export default function UsersPage() {
                 )}
               </>
             )}
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={() => handleUserAction(user.id, user.user.is_active ? 'deactivate' : 'activate')}
             >
               {user.user.is_active ? (
@@ -273,11 +291,11 @@ export default function UsersPage() {
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <AdminHeader 
-        title="User Management" 
+      <AdminHeader
+        title="User Management"
         description="Manage student accounts and registrations"
       />
-      
+
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -290,7 +308,7 @@ export default function UsersPage() {
             <p className="text-xs text-muted-foreground">All registered users</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active Users</CardTitle>
@@ -303,7 +321,7 @@ export default function UsersPage() {
             <p className="text-xs text-muted-foreground">Currently active</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Verified Users</CardTitle>
@@ -316,7 +334,7 @@ export default function UsersPage() {
             <p className="text-xs text-muted-foreground">Account verified</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pending Verification</CardTitle>
@@ -330,7 +348,7 @@ export default function UsersPage() {
           </CardContent>
         </Card>
       </div>
-      
+
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -340,10 +358,21 @@ export default function UsersPage() {
                 Manage student accounts, verify users, and handle registrations
               </CardDescription>
             </div>
-            <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
-              <UserPlus className="mr-2 h-4 w-4" />
-              Add User
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  console.log('Manual refresh clicked')
+                  fetchUsers(currentPage, searchTerm)
+                }}
+              >
+                Refresh
+              </Button>
+              <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
+                <UserPlus className="mr-2 h-4 w-4" />
+                Add User
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -359,7 +388,7 @@ export default function UsersPage() {
             </div>
             <Button type="submit">Search</Button>
             {searchTerm && (
-              <Button 
+              <Button
                 type="button"
                 variant="outline"
                 onClick={() => {
@@ -374,7 +403,7 @@ export default function UsersPage() {
           <p className="text-xs text-muted-foreground mt-1">
             Search works with first name, last name, email, phone number, institution, and department
           </p>
-          
+
           {/* Search Results Summary */}
           {searchTerm && !loading && (
             <div className="mb-4 p-3 bg-muted rounded-lg">
@@ -388,7 +417,7 @@ export default function UsersPage() {
               </p>
             </div>
           )}
-          
+
           {users.length === 0 && !loading && (
             <div className="text-center py-8">
               <Search className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
@@ -396,14 +425,14 @@ export default function UsersPage() {
                 {searchTerm ? 'No users found' : 'No users available'}
               </h3>
               <p className="text-sm text-muted-foreground mb-4">
-                {searchTerm 
+                {searchTerm
                   ? `No users match your search for "${searchTerm}". Try adjusting your search terms.`
                   : 'There are currently no users in the system.'
                 }
               </p>
               {searchTerm && (
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => {
                     setSearchTerm('')
                     fetchUsers(1, '')
@@ -414,7 +443,7 @@ export default function UsersPage() {
               )}
             </div>
           )}
-          
+
           {users.length > 0 && (
             <DataTable
               data={users}

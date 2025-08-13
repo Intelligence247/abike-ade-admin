@@ -184,7 +184,7 @@ export default function UserDetailsPage() {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
-        <AdminHeader 
+        <AdminHeader
           title={`${user.first_name} ${user.last_name}`}
           description="User details and transaction history"
         />
@@ -259,9 +259,9 @@ export default function UserDetailsPage() {
               <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
                 <FileText className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium">Agreement:</span>
-                <a 
-                  href={user.agreement} 
-                  target="_blank" 
+                <a
+                  href={process.env.NEXT_PUBLIC_API_URL + "" + user.agreement}
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-blue-600 hover:underline"
                 >
@@ -278,7 +278,7 @@ export default function UserDetailsPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {!user.verified && (
-              <Button 
+              <Button
                 onClick={() => handleUserAction('verify')}
                 className="w-full justify-start"
               >
@@ -286,7 +286,7 @@ export default function UserDetailsPage() {
                 Verify User
               </Button>
             )}
-            <Button 
+            <Button
               onClick={() => handleUserAction(user.user.is_active ? 'deactivate' : 'activate')}
               variant={user.user.is_active ? 'destructive' : 'default'}
               className="w-full justify-start"
@@ -324,7 +324,7 @@ export default function UserDetailsPage() {
             loading={transactionsLoading}
             currentPage={1}
             totalPages={1}
-            onPageChange={() => {}}
+            onPageChange={() => { }}
           />
         </CardContent>
       </Card>

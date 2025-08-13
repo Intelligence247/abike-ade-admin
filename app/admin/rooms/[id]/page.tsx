@@ -179,7 +179,7 @@ export default function RoomDetailsPage() {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
-        <AdminHeader 
+        <AdminHeader
           title={room.title}
           description="Room details and transaction history"
         />
@@ -196,8 +196,8 @@ export default function RoomDetailsPage() {
           <CardContent className="space-y-4">
             <div className="aspect-video relative bg-gray-100 rounded-lg overflow-hidden">
               {room.thumbnail ? (
-                <img 
-                  src={room.thumbnail || "/placeholder.svg"} 
+                <img
+                  src={process.env.NEXT_PUBLIC_API_URL + "" + room.thumbnail || "/placeholder.svg"}
                   alt={room.title}
                   className="w-full h-full object-cover"
                 />
@@ -280,7 +280,7 @@ export default function RoomDetailsPage() {
                 Edit Room
               </Link>
             </Button>
-            
+
             {room.student && (
               <Button asChild variant="outline" className="w-full justify-start">
                 <Link href={`/admin/users/${room.student.id}`}>
@@ -334,7 +334,7 @@ export default function RoomDetailsPage() {
             loading={transactionsLoading}
             currentPage={1}
             totalPages={1}
-            onPageChange={() => {}}
+            onPageChange={() => { }}
           />
         </CardContent>
       </Card>

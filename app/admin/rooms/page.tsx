@@ -83,6 +83,7 @@ export default function RoomsPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
+    setCurrentPage(1)
     fetchRooms(1, searchTerm)
   }
 
@@ -201,6 +202,96 @@ export default function RoomsPage() {
     </Card>
   )
 
+  const RoomListCard = ({ room }: { room: any }) => (
+    <Card className="p-4">
+      <div className="flex items-center space-x-4">
+        <div className="w-20 h-16 relative bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+          {room.thumbnail ? (
+            <img
+              src={process.env.NEXT_PUBLIC_API_URL + "" + room.thumbnail || "/placeholder.svg"}
+              alt={room.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Building className="h-8 w-8 text-gray-400" />
+            </div>
+          )}
+          <div className="absolute top-1 right-1">
+            <Badge variant={room.available ? 'default' : 'secondary'} className="text-xs">
+              {room.available ? 'Available' : 'Occupied'}
+            </Badge>
+          </div>
+        </div>
+        
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-lg">{room.title}</h3>
+              <p className="text-sm text-muted-foreground">
+                {room.features ? room.features.split(',').slice(0, 2).join(', ') : 'No features listed'}
+                {room.features && room.features.split(',').length > 2 && '...'}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="font-semibold text-lg text-green-600">₦{room.price?.toLocaleString()}</p>
+              <p className="text-sm text-muted-foreground">
+                {room.features ? room.features.split(',').length : 0} features
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem asChild>
+              <Link href={`/admin/rooms/${room.id}`}>
+                <Eye className="mr-2 h-4 w-4" />
+                View Details
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={`/admin/rooms/${room.id}/edit`}>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit Room
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Room
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the room
+                    and remove it from our servers.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => handleDeleteRoom(room.id)}>
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </Card>
+  )
+
   // Show loading state while admin is initializing
   if (adminLoading) {
     return (
@@ -265,43 +356,111 @@ export default function RoomsPage() {
               />
             </div>
             <Button type="submit">Search</Button>
+            {searchTerm && (
+              <Button 
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setSearchTerm('')
+                  fetchRooms(1, '')
+                }}
+              >
+                Clear
+              </Button>
+            )}
           </form>
+          <p className="text-xs text-muted-foreground mt-1 mb-4">
+            Search works with room titles and descriptions
+          </p>
+          
+          {/* Search Results Summary */}
+          {searchTerm && !loading && (
+            <div className="mb-4 p-3 bg-muted rounded-lg">
+              <p className="text-sm text-muted-foreground">
+                Search results for "{searchTerm}": {totalItems} room{totalItems !== 1 ? 's' : ''} found
+                {totalItems > 0 && (
+                  <span className="ml-2">
+                    (showing page {currentPage} of {totalPages})
+                  </span>
+                )}
+              </p>
+            </div>
+          )}
 
           {loading ? (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className={viewMode === 'grid' ? "grid gap-4 md:grid-cols-2 lg:grid-cols-3" : "space-y-4"}>
               {Array.from({ length: 6 }).map((_, i) => (
-                <Card key={i} className="overflow-hidden">
-                  <div className="aspect-video bg-gray-200 animate-pulse" />
-                  <CardHeader>
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                      <div className="h-3 bg-gray-200 rounded w-2/3 animate-pulse" />
+                viewMode === 'grid' ? (
+                  <Card key={i} className="overflow-hidden">
+                    <div className="aspect-video bg-gray-200 animate-pulse" />
+                    <CardHeader>
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-200 rounded animate-pulse" />
+                        <div className="h-3 bg-gray-200 rounded w-2/3 animate-pulse" />
+                      </div>
+                    </CardHeader>
+                  </Card>
+                ) : (
+                  <Card key={i} className="p-4">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-16 h-12 bg-gray-200 rounded animate-pulse" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 bg-gray-200 rounded animate-pulse" />
+                        <div className="h-3 bg-gray-200 rounded w-2/3 animate-pulse" />
+                      </div>
                     </div>
-                  </CardHeader>
-                </Card>
+                  </Card>
+                )
               ))}
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {rooms.map((room) => (
-                <RoomCard key={room.id} room={room} />
-              ))}
-            </div>
+            <>
+              {viewMode === 'grid' ? (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {rooms.map((room) => (
+                    <RoomCard key={room.id} room={room} />
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {rooms.map((room) => (
+                    <RoomListCard key={room.id} room={room} />
+                  ))}
+                </div>
+              )}
+            </>
           )}
 
           {rooms.length === 0 && !loading && (
             <div className="text-center py-12">
               <Building className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No rooms found</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                {searchTerm ? 'No rooms found' : 'No rooms available'}
+              </h3>
               <p className="text-muted-foreground mb-4">
-                {searchTerm ? 'No rooms match your search criteria.' : 'Get started by adding your first room.'}
+                {searchTerm 
+                  ? `No rooms match your search for "${searchTerm}". Try adjusting your search terms.`
+                  : 'Get started by adding your first room.'
+                }
               </p>
-              <Button asChild>
-                <Link href="/admin/rooms/add">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Room
-                </Link>
-              </Button>
+              {searchTerm ? (
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setSearchTerm('')
+                    fetchRooms(1, '')
+                  }}
+                >
+                  Clear Search
+                </Button>
+              ) : (
+                <Button asChild>
+                  <Link href="/admin/rooms/add">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Room
+                  </Link>
+                </Button>
+              )}
             </div>
           )}
 

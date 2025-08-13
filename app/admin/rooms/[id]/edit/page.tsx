@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAdmin } from '@/components/admin/admin-provider'
 import { useToast } from '@/components/ui/use-toast'
-import { ArrowLeft, Save, Upload, Image as ImageIcon, Gallery, X } from 'lucide-react'
+import { ArrowLeft, Save, Upload, Image as ImageIcon, Images, X, Building } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import {
   Dialog,
@@ -26,7 +26,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 export default function EditRoomPage() {
   const params = useParams()
   const router = useRouter()
-  const { admin } = useAdmin()
+  const { admin, isLoading: adminLoading } = useAdmin()
   const { toast } = useToast()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -44,14 +44,15 @@ export default function EditRoomPage() {
   const roomId = params.id as string
 
   useEffect(() => {
-    if (roomId) {
+    if (roomId && admin) {
       fetchRoomDetails()
       fetchGalleryImages()
       fetchAvailableGalleryImages()
     }
-  }, [roomId])
+  }, [roomId, admin])
 
   const fetchRoomDetails = async () => {
+    if (!admin) return
     try {
       admin.room.roomList({
         params: { room_id: parseInt(roomId) },
@@ -81,6 +82,7 @@ export default function EditRoomPage() {
   }
 
   const fetchGalleryImages = async () => {
+    if (!admin) return
     try {
       admin.gallery.imageList({
         onSuccess: (data) => {
@@ -96,6 +98,7 @@ export default function EditRoomPage() {
   }
 
   const fetchAvailableGalleryImages = async () => {
+    if (!admin) return
     try {
       admin.gallery.imageList({
         onSuccess: (data) => {
@@ -147,6 +150,7 @@ export default function EditRoomPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!admin) return
     setSaving(true)
 
     try {
@@ -220,6 +224,7 @@ export default function EditRoomPage() {
   }
 
   const handleGalleryUpdate = async () => {
+    if (!admin) return
     try {
       admin.room.updateRoomGallery({
         formData: {
@@ -261,7 +266,7 @@ export default function EditRoomPage() {
     })
   }
 
-  if (loading) {
+  if (loading || adminLoading || !admin) {
     return (
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <div className="animate-pulse space-y-4">
@@ -415,7 +420,7 @@ export default function EditRoomPage() {
                 <Dialog open={galleryDialogOpen} onOpenChange={setGalleryDialogOpen}>
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm">
-                      <Gallery className="mr-2 h-4 w-4" />
+                      <Images className="mr-2 h-4 w-4" />
                       Manage Gallery
                     </Button>
                   </DialogTrigger>
@@ -432,7 +437,7 @@ export default function EditRoomPage() {
                           <div key={image.id} className="relative">
                             <div className="relative">
                               <img
-                                src={image.image || "/placeholder.svg"}
+                                src={process.env.NEXT_PUBLIC_API_URL + "" + image.image || "/placeholder.svg"}
                                 alt={image.description || 'Gallery image'}
                                 className="w-full h-24 object-cover rounded-md border-2 cursor-pointer"
                                 style={{
@@ -465,7 +470,7 @@ export default function EditRoomPage() {
                         Cancel
                       </Button>
                       <Button onClick={handleGalleryUpdate}>
-                        <Gallery className="mr-2 h-4 w-4" />
+                        <Images className="mr-2 h-4 w-4" />
                         Update Gallery
                       </Button>
                     </DialogFooter>
@@ -479,7 +484,7 @@ export default function EditRoomPage() {
                   {galleryImages.map((image) => (
                     <div key={image.id} className="relative">
                       <img
-                        src={image.image || "/placeholder.svg"}
+                        src={process.env.NEXT_PUBLIC_API_URL + "" + image.image || "/placeholder.svg"}
                         alt={image.description || 'Room image'}
                         className="w-full h-24 object-cover rounded-md"
                       />
@@ -493,7 +498,7 @@ export default function EditRoomPage() {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <Gallery className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <Images className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-muted-foreground">No images in gallery</p>
                   <Button 
                     variant="outline" 
@@ -501,7 +506,7 @@ export default function EditRoomPage() {
                     className="mt-2"
                     onClick={() => setGalleryDialogOpen(true)}
                   >
-                    <Gallery className="mr-2 h-4 w-4" />
+                    <Images className="mr-2 h-4 w-4" />
                     Add Images
                   </Button>
                 </div>

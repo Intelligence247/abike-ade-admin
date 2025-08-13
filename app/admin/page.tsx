@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useAdmin } from '@/components/admin/admin-provider'
-import { Plus, Users, Building, MessageSquare } from 'lucide-react'
+import { Plus, Users, Building, MessageSquare, Image, Bell, Settings, CreditCard, FileText, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 
@@ -157,6 +157,124 @@ export default function AdminDashboard() {
       
       <StatsCards />
       
+      {/* Quick Navigation Section */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Link href="/admin/users">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer p-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <Users className="h-8 w-8 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg">User Management</h3>
+                <p className="text-sm text-muted-foreground">Manage student accounts and verifications</p>
+              </div>
+            </div>
+          </Card>
+        </Link>
+        
+        <Link href="/admin/rooms">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer p-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-green-100 rounded-lg">
+                <Building className="h-8 w-8 text-green-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg">Room Management</h3>
+                <p className="text-sm text-muted-foreground">Manage accommodation and assignments</p>
+              </div>
+            </div>
+          </Card>
+        </Link>
+        
+        <Link href="/admin/transactions">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer p-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-purple-100 rounded-lg">
+                <CreditCard className="h-8 w-8 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg">Transactions</h3>
+                <p className="text-sm text-muted-foreground">View payment history and reports</p>
+              </div>
+            </div>
+          </Card>
+        </Link>
+        
+        <Link href="/admin/gallery">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer p-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-orange-100 rounded-lg">
+                <Image className="h-8 w-8 text-orange-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg">Gallery</h3>
+                <p className="text-sm text-muted-foreground">Manage images and media</p>
+              </div>
+            </div>
+          </Card>
+        </Link>
+      </div>
+      
+      {/* Additional Navigation Section */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Link href="/admin/messages">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer p-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-indigo-100 rounded-lg">
+                <MessageSquare className="h-8 w-8 text-indigo-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg">Messages</h3>
+                <p className="text-sm text-muted-foreground">View contact form submissions</p>
+              </div>
+            </div>
+          </Card>
+        </Link>
+        
+        <Link href="/admin/notifications">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer p-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-yellow-100 rounded-lg">
+                <Bell className="h-8 w-8 text-yellow-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg">Notifications</h3>
+                <p className="text-sm text-muted-foreground">Manage system notifications</p>
+              </div>
+            </div>
+          </Card>
+        </Link>
+        
+        <Link href="/admin/broadcasts">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer p-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-red-100 rounded-lg">
+                <FileText className="h-8 w-8 text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg">Broadcasts</h3>
+                <p className="text-sm text-muted-foreground">Send announcements to users</p>
+              </div>
+            </div>
+          </Card>
+        </Link>
+        
+        <Link href="/admin/settings">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer p-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-gray-100 rounded-lg">
+                <Settings className="h-8 w-8 text-gray-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg">Settings</h3>
+                <p className="text-sm text-muted-foreground">Configure system settings</p>
+              </div>
+            </div>
+          </Card>
+        </Link>
+      </div>
+      
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
           <CardHeader>
@@ -181,7 +299,7 @@ export default function AdminDashboard() {
             ) : recentActivities.length > 0 ? (
               <div className="space-y-4">
                 {recentActivities.map((activity) => (
-                  <div key={activity.id} className="flex items-center space-x-4">
+                  <div key={activity.id} className="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg transition-colors">
                     <div className="h-8 w-8 bg-gray-100 rounded-full flex items-center justify-center">
                       {getActivityIcon(activity.type)}
                     </div>
@@ -214,34 +332,54 @@ export default function AdminDashboard() {
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>
-              Common administrative tasks
+              Common administrative tasks and shortcuts
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Link href="/admin/users/add">
-              <Button className="w-full justify-start" variant="outline">
-                <Users className="mr-2 h-4 w-4" />
-                Add New User
-              </Button>
-            </Link>
-            <Link href="/admin/rooms/add">
-              <Button className="w-full justify-start" variant="outline">
-                <Building className="mr-2 h-4 w-4" />
-                Add New Room
-              </Button>
-            </Link>
-            <Link href="/admin/broadcasts/send">
-              <Button className="w-full justify-start" variant="outline">
-                <MessageSquare className="mr-2 h-4 w-4" />
-                Send Broadcast
-              </Button>
-            </Link>
-            <Link href="/admin/transactions">
-              <Button className="w-full justify-start" variant="outline">
-                <Plus className="mr-2 h-4 w-4" />
-                View All Transactions
-              </Button>
-            </Link>
+            <div className="grid grid-cols-2 gap-3">
+              <Link href="/admin/users/add">
+                <Button className="w-full justify-start" variant="outline" size="sm">
+                  <Users className="mr-2 h-4 w-4" />
+                  Add User
+                </Button>
+              </Link>
+              <Link href="/admin/rooms/add">
+                <Button className="w-full justify-start" variant="outline" size="sm">
+                  <Building className="mr-2 h-4 w-4" />
+                  Add Room
+                </Button>
+              </Link>
+              <Link href="/admin/gallery/add">
+                <Button className="w-full justify-start" variant="outline" size="sm">
+                  <Image className="mr-2 h-4 w-4" />
+                  Add Image
+                </Button>
+              </Link>
+              <Link href="/admin/broadcasts">
+                <Button className="w-full justify-start" variant="outline" size="sm">
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  Send Broadcast
+                </Button>
+              </Link>
+            </div>
+            
+            <div className="pt-4 border-t">
+              <h4 className="text-sm font-medium mb-3">Quick Reports</h4>
+              <div className="grid grid-cols-2 gap-3">
+                <Link href="/admin/transactions/reports">
+                  <Button className="w-full justify-start" variant="ghost" size="sm">
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Transaction Report
+                  </Button>
+                </Link>
+                <Link href="/admin/users/management">
+                  <Button className="w-full justify-start" variant="ghost" size="sm">
+                    <Shield className="mr-2 h-4 w-4" />
+                    User Verification
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>

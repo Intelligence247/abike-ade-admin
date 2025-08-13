@@ -220,7 +220,7 @@ export default function GalleryPage() {
     <Card className="overflow-hidden">
       <div className="aspect-square relative bg-gray-100">
         <img 
-          src={image.image || "/placeholder.svg"} 
+          src={process.env.NEXT_PUBLIC_API_URL + "" + image.image || "/placeholder.svg"} 
           alt={image.description || 'Gallery image'}
           className="w-full h-full object-cover"
         />
@@ -241,7 +241,7 @@ export default function GalleryPage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => window.open(image.image, '_blank')}>
+              <DropdownMenuItem onClick={() => window.open(process.env.NEXT_PUBLIC_API_URL + "" + image.image, '_blank')}>
                 <Eye className="mr-2 h-4 w-4" />
                 View Full Size
               </DropdownMenuItem>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { AdminHeader } from '@/components/admin/admin-header'
+import { PageHeader } from '@/components/admin/page-header'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -142,16 +142,10 @@ export default function AddRoomPage() {
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={() => router.back()}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
-        <AdminHeader 
-          title="Add New Room" 
-          description="Create a new accommodation room"
-        />
-      </div>
+      <PageHeader
+        title="Add New Room"
+        description="Create a new accommodation room"
+      />
 
       <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
         <Card>

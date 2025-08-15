@@ -17,11 +17,22 @@ import { ThemeToggle } from '@/components/theme-toggle'
 interface AdminHeaderProps {
   title?: string
   description?: string
+  showSearch?: boolean
+  showNotifications?: boolean
+  showThemeToggle?: boolean
+  className?: string
 }
 
-export function AdminHeader({ title, description }: AdminHeaderProps) {
+export function AdminHeader({ 
+  title, 
+  description, 
+  showSearch = true, 
+  showNotifications = true, 
+  showThemeToggle = true,
+  className = ""
+}: AdminHeaderProps) {
   return (
-    <header className="flex h-16 items-center gap-2 border-b border-gray-200 dark:border-gray-800 px-4">
+    <header className={`flex h-16 items-center gap-2 border-b border-gray-200 dark:border-gray-800 px-4 ${className}`}>
       <Button variant="ghost" size="icon" className="-ml-1 md:hidden">
         <Menu className="h-4 w-4" />
       </Button>
@@ -39,16 +50,19 @@ export function AdminHeader({ title, description }: AdminHeaderProps) {
         </div>
         
         <div className="flex items-center gap-2">
-          <div className="relative hidden md:block">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search..."
-              className="w-[300px] pl-8"
-            />
-          </div>
+          {showSearch && (
+            <div className="relative hidden md:block">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search..."
+                className="w-[300px] pl-8"
+              />
+            </div>
+          )}
           
-          <DropdownMenu>
+          {showNotifications && (
+            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-4 w-4" />
@@ -80,8 +94,9 @@ export function AdminHeader({ title, description }: AdminHeaderProps) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          )}
           
-          <ThemeToggle />
+          {showThemeToggle && <ThemeToggle />}
         </div>
       </div>
     </header>

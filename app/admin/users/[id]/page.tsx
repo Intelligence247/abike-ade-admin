@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { AdminHeader } from '@/components/admin/admin-header'
+import { PageHeader } from '@/components/admin/page-header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -179,16 +179,10 @@ export default function UserDetailsPage() {
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={() => router.back()}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
-        <AdminHeader
-          title={`${user.first_name} ${user.last_name}`}
-          description="User details and transaction history"
-        />
-      </div>
+      <PageHeader
+        title={`${user.first_name} ${user.last_name}`}
+        description="User details and transaction history"
+      />
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="md:col-span-2">
@@ -200,8 +194,23 @@ export default function UserDetailsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center text-white text-xl font-medium">
-                {user.first_name?.[0]}{user.last_name?.[0]}
+              <div className="relative">
+                {user.image ? (
+                  <img
+                    src={process.env.NEXT_PUBLIC_API_URL + "" + user.image}
+                    alt={`${user.first_name} ${user.last_name}`}
+                    className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+                  />
+                ) : (
+                  <div className="w-16 h-16 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center text-white text-xl font-medium">
+                    {user.first_name?.[0]}{user.last_name?.[0]}
+                  </div>
+                )}
+                {user.verified && (
+                  <div className="absolute -top-1 -right-1 bg-green-500 rounded-full p-1">
+                    <UserCheck className="h-3 w-3 text-white" />
+                  </div>
+                )}
               </div>
               <div>
                 <h3 className="text-xl font-semibold">{user.first_name} {user.last_name}</h3>
@@ -255,37 +264,215 @@ export default function UserDetailsPage() {
               </div>
             </div>
 
-            {user.agreement && (
-              <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
-                <FileText className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Agreement:</span>
-                <a
-                  href={process.env.NEXT_PUBLIC_API_URL + "" + user.agreement}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-blue-600 hover:underline"
-                >
-                  View Document
-                </a>
+            {/* Account Information */}
+            <div className="p-4 bg-muted rounded-lg">
+              <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                Account Information
+              </h4>
+              <div className="grid gap-3 md:grid-cols-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">Account Status:</span>
+                  <Badge variant={user.user.is_active ? 'default' : 'secondary'}>
+                    {user.user.is_active ? 'Active' : 'Inactive'}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">Verification Status:</span>
+                  <Badge variant={user.verified ? 'default' : 'secondary'}>
+                    {user.verified ? 'Verified' : 'Pending'}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">Username:</span>
+                  <span className="font-mono">@{user.user.username}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">User ID:</span>
+                  <span className="font-mono">#{user.id}</span>
+                </div>
               </div>
-            )}
+            </div>
+
+            {/* Verification Documents Section */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                  Verification Documents
+                </h4>
+                <Badge variant="outline" className="text-xs">
+                  Required for verification
+                </Badge>
+              </div>
+              
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Note:</strong> Users must upload both the student agreement and identity verification documents before they can be verified by an administrator.
+                </p>
+              </div>
+              
+              {/* Agreement Document */}
+              <div className="p-4 border rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <FileText className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium">Student Agreement</h5>
+                      <p className="text-sm text-muted-foreground">
+                        {user.agreement ? 'Document uploaded' : 'No document uploaded'}
+                      </p>
+                      {user.agreement && (
+                        <p className="text-xs text-muted-foreground font-mono">
+                          {user.agreement.split('/').pop()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  {user.agreement && (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(process.env.NEXT_PUBLIC_API_URL + "" + user.agreement, '_blank')}
+                      >
+                        <FileText className="mr-2 h-4 w-4" />
+                        View
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const link = document.createElement('a')
+                          link.href = process.env.NEXT_PUBLIC_API_URL + "" + user.agreement
+                          link.download = `agreement_${user.first_name}_${user.last_name}.pdf`
+                          link.click()
+                        }}
+                      >
+                        Download
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Identity Document */}
+              <div className="p-4 border rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-green-100 rounded-lg">
+                      <Shield className="h-5 w-5 text-green-600" />
+                    </div>
+                    <div>
+                      <h5 className="font-medium">Identity Verification</h5>
+                      <p className="text-sm text-muted-foreground">
+                        {user.identity ? 'Document uploaded' : 'Not provided'}
+                      </p>
+                      {user.identity && (
+                        <p className="text-xs text-muted-foreground font-mono">
+                          {user.identity.split('/').pop()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  {user.identity && (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(process.env.NEXT_PUBLIC_API_URL + "" + user.identity, '_blank')}
+                      >
+                        <Shield className="mr-2 h-4 w-4" />
+                        View
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const link = document.createElement('a')
+                          link.href = process.env.NEXT_PUBLIC_API_URL + "" + user.identity
+                          link.download = `identity_${user.first_name}_${user.last_name}.pdf`
+                          link.click()
+                        }}
+                      >
+                        Download
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Verification Status */}
+              <div className="p-4 bg-muted rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg ${user.verified ? 'bg-green-100' : 'bg-yellow-100'}`}>
+                      {user.verified ? (
+                        <UserCheck className="h-5 w-5 text-green-600" />
+                      ) : (
+                        <Shield className="h-5 w-5 text-yellow-600" />
+                      )}
+                    </div>
+                    <div>
+                      <h5 className="font-medium">Verification Status</h5>
+                      <p className="text-sm text-muted-foreground">
+                        {user.verified ? 'User has been verified' : 'User requires verification'}
+                      </p>
+                    </div>
+                  </div>
+                  <Badge variant={user.verified ? 'default' : 'secondary'}>
+                    {user.verified ? 'Verified' : 'Pending Verification'}
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Verification Requirements */}
+              {!user.verified && (
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <h5 className="font-medium text-yellow-800 mb-2">Verification Requirements</h5>
+                  <ul className="text-sm text-yellow-700 space-y-1">
+                    <li>• Student agreement document must be uploaded</li>
+                    <li>• Identity verification document is recommended</li>
+                    <li>• Admin must review documents before verification</li>
+                    <li>• User account will be marked as verified upon approval</li>
+                  </ul>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>
+              Manage user account and verification
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             {!user.verified && (
-              <Button
-                onClick={() => handleUserAction('verify')}
-                className="w-full justify-start"
-              >
-                <Shield className="mr-2 h-4 w-4" />
-                Verify User
-              </Button>
+              <>
+                <Button
+                  onClick={() => handleUserAction('verify')}
+                  className="w-full justify-start"
+                  disabled={!user.agreement}
+                >
+                  <Shield className="mr-2 h-4 w-4" />
+                  Verify User
+                </Button>
+                {!user.agreement && (
+                  <p className="text-xs text-muted-foreground text-center">
+                    ⚠️ User must upload agreement before verification
+                  </p>
+                )}
+                {user.agreement && (
+                  <p className="text-xs text-green-600 text-center">
+                    ✅ Ready for verification
+                  </p>
+                )}
+              </>
             )}
+            
             <Button
               onClick={() => handleUserAction(user.user.is_active ? 'deactivate' : 'activate')}
               variant={user.user.is_active ? 'destructive' : 'default'}
@@ -303,6 +490,31 @@ export default function UserDetailsPage() {
                 </>
               )}
             </Button>
+
+            {/* Document Status Summary */}
+            <div className="pt-3 border-t">
+              <h4 className="text-sm font-medium mb-2">Document Status</h4>
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center justify-between">
+                  <span>Agreement:</span>
+                  <Badge variant={user.agreement ? 'default' : 'secondary'} className="text-xs">
+                    {user.agreement ? 'Uploaded' : 'Missing'}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Identity:</span>
+                  <Badge variant={user.identity ? 'default' : 'secondary'} className="text-xs">
+                    {user.identity ? 'Uploaded' : 'Missing'}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Verification:</span>
+                  <Badge variant={user.verified ? 'default' : 'secondary'} className="text-xs">
+                    {user.verified ? 'Verified' : 'Pending'}
+                  </Badge>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>

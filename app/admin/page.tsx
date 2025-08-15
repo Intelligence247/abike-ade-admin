@@ -337,7 +337,7 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
-              <Link href="/admin/users/add">
+              <Link href="/admin/users">
                 <Button className="w-full justify-start" variant="outline" size="sm">
                   <Users className="mr-2 h-4 w-4" />
                   Add User
@@ -349,7 +349,7 @@ export default function AdminDashboard() {
                   Add Room
                 </Button>
               </Link>
-              <Link href="/admin/gallery/add">
+              <Link href="/admin/gallery">
                 <Button className="w-full justify-start" variant="outline" size="sm">
                   <Image className="mr-2 h-4 w-4" />
                   Add Image

@@ -323,7 +323,7 @@ export default function EditRoomPage() {
                   onChange={handleInputChange}
                   placeholder="e.g., 150000"
                   min="0"
-                  step="1000"
+                  step="100"
                   required
                   disabled={saving}
                 />

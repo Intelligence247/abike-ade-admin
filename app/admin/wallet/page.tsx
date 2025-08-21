@@ -53,14 +53,14 @@ export default function WalletPage() {
         description="Monitor Paystack balance and manage transfers"
       />
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Paystack Balance</CardTitle>
             <Wallet className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-xl md:text-xl md:text-2xl font-bold text-green-600">
               {loading ? (
                 <div className="h-8 bg-gray-200 rounded animate-pulse w-24" />
               ) : (
@@ -89,7 +89,7 @@ export default function WalletPage() {
             <CreditCard className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-xl md:text-xl md:text-2xl font-bold">
               {balance?.currency || 'NGN'}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -104,7 +104,7 @@ export default function WalletPage() {
             <TrendingUp className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-xl md:text-xl md:text-2xl font-bold text-green-600">
               Active
             </div>
             <p className="text-xs text-muted-foreground">
@@ -114,7 +114,7 @@ export default function WalletPage() {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -170,7 +170,7 @@ export default function WalletPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
             <div className="space-y-2">
               <h4 className="font-medium">Balance Updates</h4>
               <p className="text-sm text-muted-foreground">

@@ -136,7 +136,7 @@ export default function RoomsPage() {
         </div>
       </div>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
           <CardTitle className="text-lg">{room.title}</CardTitle>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -186,7 +186,7 @@ export default function RoomsPage() {
           </DropdownMenu>
         </div>
         <CardDescription>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <span className="text-lg font-semibold text-green-600">
               ₦{parseFloat(room.price).toLocaleString()}
             </span>
@@ -225,7 +225,7 @@ export default function RoomsPage() {
         </div>
         
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <div>
               <h3 className="font-semibold text-lg">{room.title}</h3>
               <p className="text-sm text-muted-foreground">
@@ -313,28 +313,30 @@ export default function RoomsPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <div>
               <CardTitle>All Rooms ({totalItems})</CardTitle>
               <CardDescription>
                 Manage room listings, availability, and assignments
               </CardDescription>
             </div>
-            <div className="flex gap-2">
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('grid')}
-              >
-                Grid
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('list')}
-              >
-                List
-              </Button>
+            <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:gap-2">
+              <div className="flex gap-2">
+                <Button
+                  variant={viewMode === 'grid' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('grid')}
+                >
+                  Grid
+                </Button>
+                <Button
+                  variant={viewMode === 'list' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                >
+                  List
+                </Button>
+              </div>
               <Button asChild className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
                 <Link href="/admin/rooms/add">
                   <Plus className="mr-2 h-4 w-4" />
@@ -345,7 +347,7 @@ export default function RoomsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSearch} className="flex items-center space-x-2 mb-6">
+          <form onSubmit={handleSearch} className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -355,19 +357,21 @@ export default function RoomsPage() {
                 className="pl-8"
               />
             </div>
-            <Button type="submit">Search</Button>
-            {searchTerm && (
-              <Button 
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setSearchTerm('')
-                  fetchRooms(1, '')
-                }}
-              >
-                Clear
-              </Button>
-            )}
+            <div className="flex space-x-2">
+              <Button type="submit" className="flex-1 sm:flex-none">Search</Button>
+              {searchTerm && (
+                <Button 
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setSearchTerm('')
+                    fetchRooms(1, '')
+                  }}
+                >
+                  Clear
+                </Button>
+              )}
+            </div>
           </form>
           <p className="text-xs text-muted-foreground mt-1 mb-4">
             Search works with room titles and descriptions
@@ -388,7 +392,7 @@ export default function RoomsPage() {
           )}
 
           {loading ? (
-            <div className={viewMode === 'grid' ? "grid gap-4 md:grid-cols-2 lg:grid-cols-3" : "space-y-4"}>
+            <div className={viewMode === 'grid' ? "grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "space-y-4"}>
               {Array.from({ length: 6 }).map((_, i) => (
                 viewMode === 'grid' ? (
                   <Card key={i} className="overflow-hidden">
@@ -416,7 +420,7 @@ export default function RoomsPage() {
           ) : (
             <>
               {viewMode === 'grid' ? (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                   {rooms.map((room) => (
                     <RoomCard key={room.id} room={room} />
                   ))}
@@ -465,11 +469,11 @@ export default function RoomsPage() {
           )}
 
           {totalPages > 1 && (
-            <div className="flex items-center justify-between mt-6">
+            <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 mt-6">
               <p className="text-sm text-muted-foreground">
                 Page {currentPage} of {totalPages}
               </p>
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2">
                 <Button
                   variant="outline"
                   size="sm"

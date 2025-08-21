@@ -46,14 +46,14 @@ export default function MessagesPage() {
           per_page: 20,
           search
         },
-        onSuccess: (data) => {
+        onSuccess: (data: any) => {
           setMessages(data.data || [])
           setCurrentPage(data.page_number || 1)
           setTotalPages(data.total_pages || 1)
           setTotalItems(data.total_items || 0)
           setLoading(false)
         },
-        onError: (error) => {
+        onError: (error: any) => {
           toast({
             title: "Error",
             description: "Failed to fetch messages",
@@ -99,7 +99,7 @@ export default function MessagesPage() {
           setSelectedMessage(null)
           fetchMessages()
         },
-        onError: (error) => {
+        onError: (error: any) => {
           toast({
             title: "Error",
             description: error.message || "Failed to send reply",
@@ -211,7 +211,7 @@ export default function MessagesPage() {
       
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <div>
               <CardTitle>All Messages ({totalItems})</CardTitle>
               <CardDescription>
@@ -221,7 +221,7 @@ export default function MessagesPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSearch} className="flex items-center space-x-2 mb-6">
+          <form onSubmit={handleSearch} className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -231,7 +231,7 @@ export default function MessagesPage() {
                 className="pl-8"
               />
             </div>
-            <Button type="submit">Search</Button>
+            <Button type="submit" className="flex-1 sm:flex-none">Search</Button>
           </form>
           
           <DataTable

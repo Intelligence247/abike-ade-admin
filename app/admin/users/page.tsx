@@ -41,7 +41,7 @@ export default function UsersPage() {
           search,
           sort_by: 'first_name'
         },
-        onSuccess: (data) => {
+        onSuccess: (data: any) => {
           console.log('User list API response:', data)
           console.log('Users data:', data.data)
           console.log('Verification statuses:', data.data?.map((u: any) => ({
@@ -59,7 +59,7 @@ export default function UsersPage() {
           setTotalItems(data.total_items || 0)
           setLoading(false)
         },
-        onError: (error) => {
+        onError: (error: any) => {
           toast({
             title: "Error",
             description: "Failed to fetch users",
@@ -92,7 +92,7 @@ export default function UsersPage() {
         console.log('Verifying user:', userId)
         admin.user.verify({
           formData: { user_id: userId },
-          onSuccess: (data) => {
+          onSuccess: (data: any) => {
             console.log('Verify API response:', data)
             toast({
               title: "Success",
@@ -104,7 +104,7 @@ export default function UsersPage() {
               fetchUsers(currentPage, searchTerm)
             }, 500)
           },
-          onError: (error) => {
+          onError: (error: any) => {
             console.error('Verify API error:', error)
             toast({
               title: "Error",
@@ -123,7 +123,7 @@ export default function UsersPage() {
             })
             fetchUsers(currentPage, searchTerm)
           },
-          onError: (error) => {
+          onError: (error: any) => {
             toast({
               title: "Error",
               description: error.message || "Failed to verify user agreement",
@@ -141,7 +141,7 @@ export default function UsersPage() {
             })
             fetchUsers(currentPage, searchTerm)
           },
-          onError: (error) => {
+          onError: (error: any) => {
             toast({
               title: "Error",
               description: error.message || `Failed to ${action} user`,
@@ -297,14 +297,14 @@ export default function UsersPage() {
       />
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Users</CardTitle>
             <User className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalItems}</div>
+            <div className="text-xl md:text-xl md:text-2xl font-bold">{totalItems}</div>
             <p className="text-xs text-muted-foreground">All registered users</p>
           </CardContent>
         </Card>
@@ -315,7 +315,7 @@ export default function UsersPage() {
             <UserCheck className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-xl md:text-xl md:text-2xl font-bold text-green-600">
               {users.filter(u => u.user?.is_active).length}
             </div>
             <p className="text-xs text-muted-foreground">Currently active</p>
@@ -328,7 +328,7 @@ export default function UsersPage() {
             <Shield className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-xl md:text-xl md:text-2xl font-bold text-blue-600">
               {users.filter(u => u.verified).length}
             </div>
             <p className="text-xs text-muted-foreground">Account verified</p>
@@ -341,7 +341,7 @@ export default function UsersPage() {
             <UserX className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">
+            <div className="text-xl md:text-xl md:text-2xl font-bold text-orange-600">
               {users.filter(u => !u.verified).length}
             </div>
             <p className="text-xs text-muted-foreground">Awaiting verification</p>
@@ -351,14 +351,14 @@ export default function UsersPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <div>
               <CardTitle>All Users ({totalItems})</CardTitle>
               <CardDescription>
                 Manage student accounts, verify users, and handle registrations
               </CardDescription>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:gap-2">
               <Button
                 variant="outline"
                 onClick={() => {
@@ -376,7 +376,7 @@ export default function UsersPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSearch} className="flex items-center space-x-2 mb-4">
+          <form onSubmit={handleSearch} className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2 mb-4">
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -386,19 +386,21 @@ export default function UsersPage() {
                 className="pl-8"
               />
             </div>
-            <Button type="submit">Search</Button>
-            {searchTerm && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setSearchTerm('')
-                  fetchUsers(1, '')
-                }}
-              >
-                Clear
-              </Button>
-            )}
+            <div className="flex space-x-2">
+              <Button type="submit" className="flex-1 sm:flex-none">Search</Button>
+              {searchTerm && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setSearchTerm('')
+                    fetchUsers(1, '')
+                  }}
+                >
+                  Clear
+                </Button>
+              )}
+            </div>
           </form>
           <p className="text-xs text-muted-foreground mt-1">
             Search works with first name, last name, email, phone number, institution, and department

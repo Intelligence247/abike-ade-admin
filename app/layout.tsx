@@ -7,6 +7,10 @@ export const metadata: Metadata = {
   title: 'Abike Ade Admin',
   description: 'Abike Ade Admin',
   generator: 'Intel',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
+  icons: {
+    icon: '/logo.png',
+  },
 }
 
 export default function RootLayout({

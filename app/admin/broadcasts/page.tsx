@@ -223,7 +223,7 @@ export default function BroadcastsPage() {
       
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <div>
               <CardTitle>All Broadcasts ({totalItems})</CardTitle>
               <CardDescription>
@@ -284,7 +284,7 @@ export default function BroadcastsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSearch} className="flex items-center space-x-2 mb-6">
+          <form onSubmit={handleSearch} className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -294,7 +294,7 @@ export default function BroadcastsPage() {
                 className="pl-8"
               />
             </div>
-            <Button type="submit">Search</Button>
+            <Button type="submit" className="flex-1 sm:flex-none">Search</Button>
           </form>
           
           <DataTable

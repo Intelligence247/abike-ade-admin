@@ -8,9 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAdmin } from '@/components/admin/admin-provider'
 import { useToast } from '@/components/ui/use-toast'
-import { Save, Key, Shield, Bell, Database, Eye, EyeOff } from 'lucide-react'
-import { Switch } from '@/components/ui/switch'
-import { Separator } from '@/components/ui/separator'
+import { Save, Key, Eye, EyeOff } from 'lucide-react'
 
 export default function SettingsPage() {
   const { admin } = useAdmin()
@@ -26,26 +24,11 @@ export default function SettingsPage() {
     confirm_password: ''
   })
 
-  const [settings, setSettings] = useState({
-    email_notifications: true,
-    sms_notifications: false,
-    auto_backup: true,
-    maintenance_mode: false,
-    two_factor_auth: false
-  })
-
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setPasswordForm(prev => ({
       ...prev,
       [name]: value
-    }))
-  }
-
-  const handleSettingChange = (key: string, value: boolean) => {
-    setSettings(prev => ({
-      ...prev,
-      [key]: value
     }))
   }
 
@@ -89,7 +72,7 @@ export default function SettingsPage() {
           })
           setLoading(false)
         },
-        onError: (error) => {
+        onError: (error: any) => {
           toast({
             title: "Error",
             description: error.message || "Failed to change password",
@@ -98,33 +81,10 @@ export default function SettingsPage() {
           setLoading(false)
         }
       })
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
         description: "An unexpected error occurred",
-        variant: "destructive",
-      })
-      setLoading(false)
-    }
-  }
-
-  const handleSettingsSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-
-    try {
-      // Since there's no specific settings endpoint in the SDK, we'll simulate success
-      setTimeout(() => {
-        toast({
-          title: "Success",
-          description: "Settings updated successfully",
-        })
-        setLoading(false)
-      }, 1000)
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update settings",
         variant: "destructive",
       })
       setLoading(false)
@@ -135,10 +95,10 @@ export default function SettingsPage() {
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <AdminHeader 
         title="Settings" 
-        description="Manage your admin account and system preferences"
+        description="Manage your admin account password"
       />
       
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="max-w-md">
         {/* Password Change */}
         <Card>
           <CardHeader>
@@ -147,7 +107,7 @@ export default function SettingsPage() {
               Change Password
             </CardTitle>
             <CardDescription>
-              Update your admin account password
+              Update your admin account password. Password must be at least 8 alphanumeric characters long.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -209,7 +169,7 @@ export default function SettingsPage() {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Password must be at least 8 characters long
+                  Password must be at least 8 alphanumeric characters long
                 </p>
               </div>
 
@@ -262,161 +222,7 @@ export default function SettingsPage() {
             </form>
           </CardContent>
         </Card>
-
-        {/* System Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              System Settings
-            </CardTitle>
-            <CardDescription>
-              Configure system preferences and security
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSettingsSubmit} className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base">Email Notifications</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Receive email alerts for important events
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.email_notifications}
-                    onCheckedChange={(checked) => handleSettingChange('email_notifications', checked)}
-                  />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base">SMS Notifications</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Receive SMS alerts for critical events
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.sms_notifications}
-                    onCheckedChange={(checked) => handleSettingChange('sms_notifications', checked)}
-                  />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base">Auto Backup</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Automatically backup data daily
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.auto_backup}
-                    onCheckedChange={(checked) => handleSettingChange('auto_backup', checked)}
-                  />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base">Two-Factor Authentication</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Add extra security to your account
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.two_factor_auth}
-                    onCheckedChange={(checked) => handleSettingChange('two_factor_auth', checked)}
-                  />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base">Maintenance Mode</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Put the site in maintenance mode
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.maintenance_mode}
-                    onCheckedChange={(checked) => handleSettingChange('maintenance_mode', checked)}
-                  />
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full"
-              >
-                {loading ? (
-                  <>
-                    <Save className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Settings
-                  </>
-                )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
       </div>
-
-      {/* Security Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Database className="h-5 w-5" />
-            Security Information
-          </CardTitle>
-          <CardDescription>
-            Important security guidelines and best practices
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <h4 className="font-medium">Password Security</h4>
-              <p className="text-sm text-muted-foreground">
-                Use a strong password with at least 8 characters, including uppercase, 
-                lowercase, numbers, and special characters. Change your password regularly.
-              </p>
-            </div>
-            <div className="space-y-2">
-              <h4 className="font-medium">Two-Factor Authentication</h4>
-              <p className="text-sm text-muted-foreground">
-                Enable 2FA for additional security. This adds an extra layer of protection 
-                to your admin account even if your password is compromised.
-              </p>
-            </div>
-            <div className="space-y-2">
-              <h4 className="font-medium">Session Management</h4>
-              <p className="text-sm text-muted-foreground">
-                Always log out when finished, especially on shared computers. 
-                Your session will automatically expire after a period of inactivity.
-              </p>
-            </div>
-            <div className="space-y-2">
-              <h4 className="font-medium">Backup & Recovery</h4>
-              <p className="text-sm text-muted-foreground">
-                Regular backups are essential. Enable auto-backup to ensure your data 
-                is safely stored and can be recovered if needed.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }

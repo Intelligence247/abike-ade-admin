@@ -34,12 +34,16 @@ export default function RefundsPage() {
   const [totalPages, setTotalPages] = useState(1)
   const [totalItems, setTotalItems] = useState(0)
   const [initiateDialogOpen, setInitiateDialogOpen] = useState(false)
+  const [transferDialogOpen, setTransferDialogOpen] = useState(false)
+  const [selectedRefund, setSelectedRefund] = useState<any>(null)
   const [refundForm, setRefundForm] = useState({
     reference: '',
     amount: '',
     account_number: '',
     account_name: '',
-    bank_code: '',
+    bank_code: ''
+  })
+  const [transferForm, setTransferForm] = useState({
     password: ''
   })
 
@@ -53,14 +57,14 @@ export default function RefundsPage() {
           search,
           sort_by: '-date'
         },
-        onSuccess: (data) => {
+        onSuccess: (data: any) => {
           setRefunds(data.data || [])
           setCurrentPage(data.page_number || 1)
           setTotalPages(data.total_pages || 1)
           setTotalItems(data.total_items || 0)
           setLoading(false)
         },
-        onError: (error) => {
+        onError: (error: any) => {
           toast({
             title: "Error",
             description: "Failed to fetch refunds",
@@ -74,6 +78,8 @@ export default function RefundsPage() {
     }
   }
 
+
+
   useEffect(() => {
     fetchRefunds()
   }, [])
@@ -85,40 +91,111 @@ export default function RefundsPage() {
 
   const handleInitiateRefund = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Validate amount (must be at least ₦100)
+    const amount = parseInt(refundForm.amount)
+    if (amount < 100) {
+      toast({
+        title: "Error",
+        description: "Refund amount must be at least ₦100",
+        variant: "destructive",
+      })
+      return
+    }
+    
+    // Check if refund already exists for this transaction
+    const existingRefund = refunds.find(refund => 
+      refund.transaction?.reference === refundForm.reference
+    )
+    
+    if (existingRefund) {
+      toast({
+        title: "Error",
+        description: "A refund already exists for this transaction",
+        variant: "destructive",
+      })
+      return
+    }
+    
     try {
       admin.transaction.initiateRefund({
         formData: {
           reference: refundForm.reference,
-          amount: parseInt(refundForm.amount),
+          amount: amount,
           account_number: refundForm.account_number,
           account_name: refundForm.account_name,
           bank_code: refundForm.bank_code
         },
-        onSuccess: (data) => {
-          toast({
-            title: "Success",
-            description: "Refund initiated successfully",
-          })
-          setInitiateDialogOpen(false)
-          setRefundForm({
-            reference: '',
-            amount: '',
-            account_number: '',
-            account_name: '',
-            bank_code: '',
-            password: ''
-          })
-          fetchRefunds()
+        onSuccess: (data: any) => {
+          if (data.status === 'success') {
+            // Step 1 successful - now proceed to Step 2: Make Transfer
+            const refundReference = data.data?.reference
+            if (refundReference) {
+              // Store the refund reference for the transfer step
+              setSelectedRefund({
+                reference: refundReference,
+                amount: amount,
+                account_name: refundForm.account_name,
+                account_number: refundForm.account_number
+              })
+              
+              // Close the initiate dialog and open the transfer dialog
+              setInitiateDialogOpen(false)
+              setTransferDialogOpen(true)
+              
+              // Show success message for Step 1
+              toast({
+                title: "Step 1 Complete",
+                description: "Refund initiated successfully. Now enter your password to complete the transfer.",
+              })
+            } else {
+              toast({
+                title: "Error",
+                description: "Refund initiated but no reference returned",
+                variant: "destructive",
+              })
+            }
+          } else {
+            // Handle error response with 200 status
+            toast({
+              title: "Error",
+              description: data.message || "Failed to initiate refund",
+              variant: "destructive",
+            })
+          }
         },
-        onError: (error) => {
+        onError: (error: any) => {
+          // Handle specific error cases
+          let errorMessage = "Failed to initiate refund"
+          
+          if (error.message) {
+            if (error.message.includes("Invalid transaction reference")) {
+              errorMessage = "Invalid transaction reference. Please check the reference number."
+            } else if (error.message.includes("Invalid bank code")) {
+              errorMessage = "Invalid bank code provided. Please verify the bank code."
+            } else if (error.message.includes("unsuccessful transactions")) {
+              errorMessage = "Refund cannot be made on unsuccessful transactions."
+            } else if (error.message.includes("greater than rent amount")) {
+              errorMessage = "Refund amount cannot be greater than the original rent amount."
+            } else if (error.message.includes("expired rent")) {
+              errorMessage = "Refund cannot be made on expired rent."
+            } else if (error.message.includes("less than 100")) {
+              errorMessage = "Refund amount must be at least ₦100."
+            } else if (error.message.includes("UNIQUE constraint failed")) {
+              errorMessage = "A refund already exists for this transaction."
+            } else {
+              errorMessage = error.message
+            }
+          }
+          
           toast({
             title: "Error",
-            description: error.message || "Failed to initiate refund",
+            description: errorMessage,
             variant: "destructive",
           })
         }
       })
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
         description: "An unexpected error occurred",
@@ -127,32 +204,98 @@ export default function RefundsPage() {
     }
   }
 
-  const handleMakeTransfer = async (refundReference: string) => {
-    const password = prompt("Enter your admin password to authorize this transfer:")
-    if (!password) return
+  const handleMakeTransfer = async (refundReference: any) => {
+    setSelectedRefund(refundReference)
+    setTransferDialogOpen(true)
+  }
 
+  const handleTransferSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!selectedRefund) {
+      toast({
+        title: "Error",
+        description: "No refund selected for transfer",
+        variant: "destructive",
+      })
+      return
+    }
+    
+    if (!transferForm.password) {
+      toast({
+        title: "Error",
+        description: "Password is required",
+        variant: "destructive",
+      })
+      return
+    }
+    
     try {
       admin.transaction.makeTransfer({
         formData: {
-          reference: refundReference,
-          password
+          reference: selectedRefund.reference,
+          password: transferForm.password
         },
-        onSuccess: () => {
-          toast({
-            title: "Success",
-            description: "Transfer initiated successfully",
-          })
-          fetchRefunds()
+        onSuccess: (data: any) => {
+          if (data.status === 'success') {
+            toast({
+              title: "Success",
+              description: data.message || "Refund transfer completed successfully",
+            })
+            
+            // Close the transfer dialog
+            setTransferDialogOpen(false)
+            
+            // Reset forms
+            setRefundForm({
+              reference: '',
+              amount: '',
+              account_number: '',
+              account_name: '',
+              bank_code: ''
+            })
+            setTransferForm({ password: '' })
+            setSelectedRefund(null)
+            
+            // Refresh the refunds list to show the new refund
+            fetchRefunds()
+          } else {
+            // Handle error response with 200 status
+            toast({
+              title: "Error",
+              description: data.message || "Failed to complete transfer",
+              variant: "destructive",
+            })
+          }
         },
-        onError: (error) => {
+        onError: (error: any) => {
+          // Handle specific error cases
+          let errorMessage = "Failed to complete transfer"
+          
+          if (error.message) {
+            if (error.message.includes("Invalid transfer reference")) {
+              errorMessage = "Invalid transfer reference. Please try initiating the refund again."
+            } else if (error.message.includes("Invalid password")) {
+              errorMessage = "Invalid password. Please check your admin password."
+            } else if (error.message.includes("Incorrect password")) {
+              errorMessage = "Incorrect password. Please check your admin password."
+            } else if (error.message.includes("third party payouts")) {
+              errorMessage = "Third party payouts are currently disabled."
+            } else if (error.message.includes("UNIQUE constraint failed")) {
+              errorMessage = "Transfer already exists for this refund."
+            } else {
+              errorMessage = error.message
+            }
+          }
+          
           toast({
             title: "Error",
-            description: error.message || "Failed to make transfer",
+            description: errorMessage,
             variant: "destructive",
           })
         }
       })
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
         description: "An unexpected error occurred",
@@ -237,7 +380,7 @@ export default function RefundsPage() {
         refund.status === 'unpaid' ? (
           <Button
             size="sm"
-            onClick={() => handleMakeTransfer(refund.reference)}
+            onClick={() => handleMakeTransfer(refund)}
             className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
           >
             <Send className="mr-1 h-3 w-3" />
@@ -263,7 +406,7 @@ export default function RefundsPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <div>
               <CardTitle>All Refunds ({totalItems})</CardTitle>
               <CardDescription>
@@ -303,8 +446,12 @@ export default function RefundsPage() {
                       value={refundForm.amount}
                       onChange={(e) => setRefundForm(prev => ({ ...prev, amount: e.target.value }))}
                       placeholder="100000"
+                      min="100"
                       required
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Minimum amount: ₦100
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="account_number">Account Number</Label>
@@ -361,6 +508,13 @@ export default function RefundsPage() {
               />
             </div>
             <Button type="submit">Search</Button>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => fetchRefunds()}
+            >
+              Refresh
+            </Button>
           </form>
           
           <DataTable
@@ -373,6 +527,56 @@ export default function RefundsPage() {
           />
         </CardContent>
       </Card>
+
+
+
+      <Dialog open={transferDialogOpen} onOpenChange={setTransferDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Complete Refund Transfer (Step 2)</DialogTitle>
+            <DialogDescription>
+              Enter your admin password to complete the refund transfer
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedRefund && (
+            <div className="bg-blue-50 p-4 rounded-lg mb-4">
+              <h4 className="font-medium text-blue-800 mb-2">Refund Details:</h4>
+              <div className="text-sm text-blue-700 space-y-1">
+                <p><strong>Refund Reference:</strong> {selectedRefund.reference}</p>
+                <p><strong>Amount:</strong> ₦{selectedRefund.amount?.toLocaleString()}</p>
+                <p><strong>Recipient:</strong> {selectedRefund.account_name}</p>
+                <p><strong>Account:</strong> {selectedRefund.account_number}</p>
+              </div>
+            </div>
+          )}
+          
+          <form onSubmit={handleTransferSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="password">Admin Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={transferForm.password}
+                onChange={(e) => setTransferForm(prev => ({ ...prev, password: e.target.value }))}
+                placeholder="Enter your admin password"
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                This password is required to authorize the refund transfer
+              </p>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setTransferDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700">
+                Complete Transfer
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

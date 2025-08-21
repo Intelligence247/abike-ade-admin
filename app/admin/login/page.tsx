@@ -66,11 +66,15 @@ export default function AdminLogin() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">AC</span>
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden">
+              <img 
+                src={`/logo.png`} 
+                alt="Abike Ade Court logo" 
+                className="w-full h-full object-contain"
+              />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-center">Admin Login</CardTitle>
+          <CardTitle className="text-xl md:text-2xl font-bold text-center">Admin Login</CardTitle>
           <CardDescription className="text-center">
             Sign in to access the Abike Ade Court admin dashboard
           </CardDescription>

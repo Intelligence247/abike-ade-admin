@@ -103,7 +103,7 @@ export default function BankListPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <div>
               <CardTitle>Nigerian Banks ({filteredBanks.length})</CardTitle>
               <CardDescription>
@@ -145,7 +145,7 @@ export default function BankListPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2">
             <div className="space-y-2">
               <h4 className="font-medium">For Refunds</h4>
               <p className="text-sm text-muted-foreground">

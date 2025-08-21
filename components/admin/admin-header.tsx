@@ -1,6 +1,6 @@
 "use client"
 
-import { Bell, Search, Menu } from 'lucide-react'
+import { Bell, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -33,10 +33,6 @@ export function AdminHeader({
 }: AdminHeaderProps) {
   return (
     <header className={`flex h-16 items-center gap-2 border-b border-gray-200 dark:border-gray-800 px-4 ${className}`}>
-      <Button variant="ghost" size="icon" className="-ml-1 md:hidden">
-        <Menu className="h-4 w-4" />
-      </Button>
-      
       <div className="flex flex-1 items-center gap-4">
         <div className="flex-1">
           {title && (

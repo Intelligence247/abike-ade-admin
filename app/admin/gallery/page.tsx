@@ -69,14 +69,14 @@ export default function GalleryPage() {
           per_page: 20,
           search
         },
-        onSuccess: (data) => {
+        onSuccess: (data: any) => {
           setImages(data.data || [])
           setCurrentPage(data.page_number || 1)
           setTotalPages(data.total_pages || 1)
           setTotalItems(data.total_items || 0)
           setLoading(false)
         },
-        onError: (error) => {
+        onError: (error: any) => {
           toast({
             title: "Error",
             description: "Failed to fetch images",
@@ -124,7 +124,7 @@ export default function GalleryPage() {
           setImageFile(null)
           fetchImages()
         },
-        onError: (error) => {
+        onError: (error: any) => {
           toast({
             title: "Error",
             description: error.message || "Failed to upload image",
@@ -162,7 +162,7 @@ export default function GalleryPage() {
           setUploadForm({ description: '', featured: false })
           fetchImages()
         },
-        onError: (error) => {
+        onError: (error: any) => {
           toast({
             title: "Error",
             description: error.message || "Failed to update image",
@@ -190,7 +190,7 @@ export default function GalleryPage() {
           })
           fetchImages()
         },
-        onError: (error) => {
+        onError: (error: any) => {
           toast({
             title: "Error",
             description: error.message || "Failed to delete image",
@@ -291,7 +291,7 @@ export default function GalleryPage() {
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="h-32 bg-gray-200 rounded"></div>
             ))}
@@ -310,7 +310,7 @@ export default function GalleryPage() {
       
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <div>
               <CardTitle>Image Gallery ({totalItems})</CardTitle>
               <CardDescription>
@@ -355,7 +355,7 @@ export default function GalleryPage() {
                       rows={3}
                     />
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2">
                     <Checkbox
                       id="featured"
                       checked={uploadForm.featured}
@@ -377,7 +377,7 @@ export default function GalleryPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSearch} className="flex items-center space-x-2 mb-6">
+          <form onSubmit={handleSearch} className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -387,11 +387,11 @@ export default function GalleryPage() {
                 className="pl-8"
               />
             </div>
-            <Button type="submit">Search</Button>
+            <Button type="submit" className="flex-1 sm:flex-none">Search</Button>
           </form>
           
           {loading ? (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {Array.from({ length: 8 }).map((_, i) => (
                 <Card key={i} className="overflow-hidden">
                   <div className="aspect-square bg-gray-200 animate-pulse" />
@@ -402,7 +402,7 @@ export default function GalleryPage() {
               ))}
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {images.map((image) => (
                 <ImageCard key={image.id} image={image} />
               ))}
@@ -424,11 +424,11 @@ export default function GalleryPage() {
           )}
 
           {totalPages > 1 && (
-            <div className="flex items-center justify-between mt-6">
+            <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 mt-6">
               <p className="text-sm text-muted-foreground">
                 Page {currentPage} of {totalPages}
               </p>
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -471,7 +471,7 @@ export default function GalleryPage() {
                 rows={3}
               />
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2">
               <Checkbox
                 id="edit-featured"
                 checked={uploadForm.featured}

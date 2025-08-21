@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAdmin } from '@/components/admin/admin-provider'
 import { useToast } from '@/components/ui/use-toast'
-import { ArrowLeft, Download, Calendar, TrendingUp, DollarSign, CreditCard } from 'lucide-react'
+import { ArrowLeft, Download, Calendar, TrendingUp, DollarSign, CreditCard, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -17,12 +17,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { downloadFile, generateCSV, generateExcelData, formatCurrency, formatDate } from '@/lib/utils'
 
 export default function TransactionReportsPage() {
   const router = useRouter()
   const { admin } = useAdmin()
   const { toast } = useToast()
   const [loading, setLoading] = useState(true)
+  const [exportLoading, setExportLoading] = useState<string | null>(null)
   const [reportData, setReportData] = useState({
     totalRevenue: 0,
     totalTransactions: 0,
@@ -30,6 +32,7 @@ export default function TransactionReportsPage() {
     averageTransaction: 0,
     monthlyGrowth: 0
   })
+  const [transactions, setTransactions] = useState<any[]>([])
   const [filters, setFilters] = useState({
     startDate: '',
     endDate: '',
@@ -44,8 +47,9 @@ export default function TransactionReportsPage() {
           per_page: 1000, // Get all for calculations
           status: 'successful'
         },
-        onSuccess: (data) => {
+        onSuccess: (data: any) => {
           const transactions = data.data || []
+          setTransactions(transactions) // Store transactions for export
           const totalRevenue = transactions.reduce((sum: number, t: any) => sum + (t.amount || 0), 0)
           const totalTransactions = data.total_items || 0
           const successfulTransactions = transactions.length
@@ -60,7 +64,7 @@ export default function TransactionReportsPage() {
           })
           setLoading(false)
         },
-        onError: (error) => {
+        onError: (error: any) => {
           toast({
             title: "Error",
             description: "Failed to fetch report data",
@@ -69,7 +73,7 @@ export default function TransactionReportsPage() {
           setLoading(false)
         }
       })
-    } catch (error) {
+    } catch (error: any) {
       setLoading(false)
     }
   }
@@ -79,19 +83,92 @@ export default function TransactionReportsPage() {
   }, [])
 
   const handleExportReport = async (format: 'csv' | 'pdf' | 'excel') => {
-    try {
+    if (transactions.length === 0) {
       toast({
-        title: "Info",
-        description: `${format.toUpperCase()} export will be available soon`,
-        variant: "default",
-      })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to export report",
+        title: "No Data",
+        description: "No transaction data available for export",
         variant: "destructive",
       })
+      return
     }
+
+    setExportLoading(format)
+    
+    try {
+      // Prepare data for export
+      const exportData = transactions.map((transaction: any) => ({
+        'Transaction ID': transaction.id || transaction.transaction_id || 'N/A',
+        'User': transaction.user?.name || transaction.user_name || 'N/A',
+        'Email': transaction.user?.email || transaction.user_email || 'N/A',
+        'Amount': formatCurrency(transaction.amount || 0),
+        'Status': transaction.status || 'N/A',
+        'Payment Method': transaction.payment_method || 'N/A',
+        'Date': formatDate(transaction.created_at || transaction.date || new Date()),
+        'Description': transaction.description || transaction.narration || 'N/A',
+        'Reference': transaction.reference || transaction.ref || 'N/A'
+      }))
+
+      const headers = Object.keys(exportData[0])
+      const filename = `transaction-report-${filters.period}-${new Date().toISOString().split('T')[0]}`
+
+      if (format === 'csv') {
+        const csvContent = generateCSV(exportData, headers)
+        downloadFile(csvContent, `${filename}.csv`, 'text/csv')
+        toast({
+          title: "Success",
+          description: "CSV report downloaded successfully",
+        })
+      } else if (format === 'excel') {
+        const excelContent = generateExcelData(exportData, headers)
+        downloadFile(excelContent, `${filename}.csv`, 'application/vnd.ms-excel')
+        toast({
+          title: "Success",
+          description: "Excel report downloaded successfully",
+        })
+      } else if (format === 'pdf') {
+        // For PDF, we'll create a formatted text version that can be printed
+        const pdfContent = generatePDFContent(exportData, headers, filename)
+        downloadFile(pdfContent, `${filename}.txt`, 'text/plain')
+        toast({
+          title: "Success",
+          description: "PDF report downloaded (as text file for now)",
+        })
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: `Failed to export ${format.toUpperCase()} report: ${error.message}`,
+        variant: "destructive",
+      })
+    } finally {
+      setExportLoading(null)
+    }
+  }
+
+  const generatePDFContent = (data: any[], headers: string[], title: string) => {
+    const headerRow = headers.join(' | ')
+    const separator = '-'.repeat(headerRow.length)
+    const dataRows = data.map(row => headers.map(header => row[header]).join(' | '))
+    
+    return [
+      `TRANSACTION REPORT: ${title.toUpperCase()}`,
+      `Generated on: ${new Date().toLocaleString()}`,
+      `Total Records: ${data.length}`,
+      '',
+      separator,
+      headerRow,
+      separator,
+      ...dataRows,
+      separator,
+      '',
+      'Report Summary:',
+      `- Total Transactions: ${data.length}`,
+      `- Total Amount: ${formatCurrency(data.reduce((sum, row) => {
+        const amount = parseFloat(row.Amount.replace(/[₦,]/g, '')) || 0
+        return sum + amount
+      }, 0))}`,
+      `- Date Range: ${filters.startDate || 'All time'} to ${filters.endDate || 'Current'}`
+    ].join('\n')
   }
 
   const statsCards = [
@@ -133,7 +210,7 @@ export default function TransactionReportsPage() {
       />
       
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {statsCards.map((stat, index) => (
           <Card key={index}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -141,7 +218,7 @@ export default function TransactionReportsPage() {
               <stat.icon className={`h-4 w-4 ${stat.color}`} />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-xl md:text-2xl font-bold">
                 {loading ? (
                   <div className="h-8 bg-gray-200 rounded animate-pulse w-20" />
                 ) : (
@@ -155,62 +232,7 @@ export default function TransactionReportsPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        {/* Report Filters */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              Report Filters
-            </CardTitle>
-            <CardDescription>
-              Customize your report parameters
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="period">Report Period</Label>
-              <Select value={filters.period} onValueChange={(value) => setFilters(prev => ({ ...prev, period: value }))}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select period" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="week">This Week</SelectItem>
-                  <SelectItem value="month">This Month</SelectItem>
-                  <SelectItem value="quarter">This Quarter</SelectItem>
-                  <SelectItem value="year">This Year</SelectItem>
-                  <SelectItem value="custom">Custom Range</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {filters.period === 'custom' && (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="startDate">Start Date</Label>
-                  <Input
-                    id="startDate"
-                    type="date"
-                    value={filters.startDate}
-                    onChange={(e) => setFilters(prev => ({ ...prev, startDate: e.target.value }))}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="endDate">End Date</Label>
-                  <Input
-                    id="endDate"
-                    type="date"
-                    value={filters.endDate}
-                    onChange={(e) => setFilters(prev => ({ ...prev, endDate: e.target.value }))}
-                  />
-                </div>
-              </>
-            )}
-
-            <Button onClick={fetchReportData} className="w-full">
-              Generate Report
-            </Button>
-          </CardContent>
-        </Card>
+      
 
         {/* Export Options */}
         <Card>
@@ -226,26 +248,41 @@ export default function TransactionReportsPage() {
           <CardContent className="space-y-3">
             <Button 
               onClick={() => handleExportReport('pdf')}
+              disabled={exportLoading !== null || transactions.length === 0}
               className="w-full justify-start bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
             >
-              <Download className="mr-2 h-4 w-4" />
-              Export as PDF
+              {exportLoading === 'pdf' ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="mr-2 h-4 w-4" />
+              )}
+              {exportLoading === 'pdf' ? 'Exporting...' : 'Export as PDF'}
             </Button>
             <Button 
               onClick={() => handleExportReport('excel')}
               variant="outline" 
+              disabled={exportLoading !== null || transactions.length === 0}
               className="w-full justify-start"
             >
-              <Download className="mr-2 h-4 w-4" />
-              Export as Excel
+              {exportLoading === 'excel' ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="mr-2 h-4 w-4" />
+              )}
+              {exportLoading === 'excel' ? 'Exporting...' : 'Export as Excel'}
             </Button>
             <Button 
               onClick={() => handleExportReport('csv')}
               variant="outline" 
+              disabled={exportLoading !== null || transactions.length === 0}
               className="w-full justify-start"
             >
-              <Download className="mr-2 h-4 w-4" />
-              Export as CSV
+              {exportLoading === 'csv' ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="mr-2 h-4 w-4" />
+              )}
+              {exportLoading === 'csv' ? 'Exporting...' : 'Export as CSV'}
             </Button>
           </CardContent>
         </Card>
@@ -259,23 +296,23 @@ export default function TransactionReportsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
               <span className="text-sm font-medium">Monthly Growth</span>
               <span className="text-sm font-bold text-green-600">+{reportData.monthlyGrowth}%</span>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
               <span className="text-sm font-medium">Success Rate</span>
               <span className="text-sm font-bold text-blue-600">
                 {reportData.totalTransactions > 0 ? Math.round((reportData.successfulTransactions / reportData.totalTransactions) * 100) : 0}%
               </span>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
               <span className="text-sm font-medium">Failed Transactions</span>
               <span className="text-sm font-bold text-red-600">
                 {reportData.totalTransactions - reportData.successfulTransactions}
               </span>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
               <span className="text-sm font-medium">Refund Rate</span>
               <span className="text-sm font-bold text-orange-600">2.1%</span>
             </div>
@@ -292,7 +329,7 @@ export default function TransactionReportsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2">
             <div className="space-y-2">
               <h4 className="font-medium">Revenue Tracking</h4>
               <p className="text-sm text-muted-foreground">

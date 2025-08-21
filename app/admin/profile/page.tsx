@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAdmin } from '@/components/admin/admin-provider'
 import { useToast } from '@/components/ui/use-toast'
-import { Save, User, Mail, Calendar, Shield, Activity } from 'lucide-react'
+import { Save, User, Mail, Calendar, Activity } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 
@@ -206,7 +206,7 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="first_name">First Name</Label>
                   <Input
@@ -278,57 +278,6 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Account Security */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Account Security
-          </CardTitle>
-          <CardDescription>
-            Manage your account security settings
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <h4 className="font-medium">Password</h4>
-              <p className="text-sm text-muted-foreground">
-                Last changed: Never (or date if available)
-              </p>
-              <Button variant="outline" size="sm" asChild>
-                <a href="/admin/settings">Change Password</a>
-              </Button>
-            </div>
-            <div className="space-y-2">
-              <h4 className="font-medium">Two-Factor Authentication</h4>
-              <p className="text-sm text-muted-foreground">
-                Add an extra layer of security to your account
-              </p>
-              <Button variant="outline" size="sm" asChild>
-                <a href="/admin/settings">Configure 2FA</a>
-              </Button>
-            </div>
-            <div className="space-y-2">
-              <h4 className="font-medium">Login History</h4>
-              <p className="text-sm text-muted-foreground">
-                Monitor recent login activity on your account
-              </p>
-              <Button variant="outline" size="sm" disabled>
-                View History (Coming Soon)
-              </Button>
-            </div>
-            <div className="space-y-2">
-              <h4 className="font-medium">Account Status</h4>
-              <p className="text-sm text-muted-foreground">
-                Your account is active and in good standing
-              </p>
-              <Badge variant="default">Active Account</Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }

@@ -204,7 +204,7 @@ export default function FeaturedGalleryPage() {
       
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Star className="h-5 w-5 text-yellow-500" />
@@ -221,7 +221,7 @@ export default function FeaturedGalleryPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {Array.from({ length: 8 }).map((_, i) => (
                 <Card key={i} className="overflow-hidden">
                   <div className="aspect-square bg-gray-200 animate-pulse" />
@@ -232,7 +232,7 @@ export default function FeaturedGalleryPage() {
               ))}
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {featuredImages.map((image) => (
                 <ImageCard key={image.id} image={image} />
               ))}
@@ -263,7 +263,7 @@ export default function FeaturedGalleryPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2">
             <div className="space-y-2">
               <h4 className="font-medium">Homepage Display</h4>
               <p className="text-sm text-muted-foreground">

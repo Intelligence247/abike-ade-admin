@@ -175,7 +175,7 @@ export default function UserTransactionsPage() {
       {/* User Info Card */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <div className="flex items-center space-x-4">
               <div className="w-16 h-16 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-medium">
                 {user.first_name?.[0]}{user.last_name?.[0]}
@@ -197,15 +197,15 @@ export default function UserTransactionsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="flex items-center space-x-2">
+          <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2">
               <User className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Status:</span>
               <Badge variant={user.user?.is_active ? 'default' : 'secondary'}>
                 {user.user?.is_active ? 'Active' : 'Inactive'}
               </Badge>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2">
               <Shield className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Verified:</span>
               <Badge variant={user.verified ? 'default' : 'outline'}>
@@ -213,7 +213,7 @@ export default function UserTransactionsPage() {
               </Badge>
             </div>
             {user.institution && (
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2">
                 <Building className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">{user.institution}</span>
               </div>
@@ -225,7 +225,7 @@ export default function UserTransactionsPage() {
       {/* Transactions Card */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <div>
               <CardTitle>Transaction History ({totalItems})</CardTitle>
               <CardDescription>

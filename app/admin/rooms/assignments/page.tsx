@@ -78,14 +78,14 @@ export default function RoomAssignmentsPage() {
           search,
           available: false // Only occupied rooms
         },
-        onSuccess: (data) => {
+        onSuccess: (data: any) => {
           setAssignments(data.data || [])
           setCurrentPage(data.page_number || 1)
           setTotalPages(data.total_pages || 1)
           setTotalItems(data.total_items || 0)
           setLoading(false)
         },
-        onError: (error) => {
+        onError: (error: any) => {
           toast({
             title: "Error",
             description: "Failed to fetch room assignments",
@@ -106,10 +106,10 @@ export default function RoomAssignmentsPage() {
           available: true,
           per_page: 100
         },
-        onSuccess: (data) => {
+        onSuccess: (data: any) => {
           setAvailableRooms(data.data || [])
         },
-        onError: (error) => {
+        onError: (error: any) => {
           console.error('Failed to fetch available rooms:', error)
         }
       })
@@ -125,10 +125,10 @@ export default function RoomAssignmentsPage() {
           per_page: 100,
           sort_by: 'first_name'
         },
-        onSuccess: (data) => {
+        onSuccess: (data: any) => {
           setAvailableUsers(data.data || [])
         },
-        onError: (error) => {
+        onError: (error: any) => {
           console.error('Failed to fetch available users:', error)
         }
       })
@@ -176,7 +176,7 @@ export default function RoomAssignmentsPage() {
           fetchAssignments()
           fetchAvailableRooms() // Refresh available rooms
         },
-        onError: (error) => {
+        onError: (error: any) => {
           toast({
             title: "Error",
             description: error.message || "Failed to assign room",
@@ -306,14 +306,14 @@ export default function RoomAssignmentsPage() {
         description="Manage room assignments and student allocations"
       />
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Assignments</CardTitle>
             <Users className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalItems}</div>
+            <div className="text-xl md:text-xl md:text-2xl font-bold">{totalItems}</div>
             <p className="text-xs text-muted-foreground">Active room assignments</p>
           </CardContent>
         </Card>
@@ -324,7 +324,7 @@ export default function RoomAssignmentsPage() {
             <Building className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{availableRooms.length}</div>
+            <div className="text-xl md:text-xl md:text-2xl font-bold text-green-600">{availableRooms.length}</div>
             <p className="text-xs text-muted-foreground">Ready for assignment</p>
           </CardContent>
         </Card>
@@ -335,7 +335,7 @@ export default function RoomAssignmentsPage() {
             <UserPlus className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-600">{availableUsers.length}</div>
+            <div className="text-xl md:text-xl md:text-2xl font-bold text-purple-600">{availableUsers.length}</div>
             <p className="text-xs text-muted-foreground">Eligible for rooms</p>
           </CardContent>
         </Card>
@@ -343,7 +343,7 @@ export default function RoomAssignmentsPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <div>
               <CardTitle>Room Assignments ({totalItems})</CardTitle>
               <CardDescription>

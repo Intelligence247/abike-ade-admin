@@ -113,11 +113,11 @@ export default function SiteManagementPage() {
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <AdminHeader 
-        title="Site Management" 
+      <AdminHeader
+        title="Site Management"
         description="Update site information and contact details"
       />
-      
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
@@ -251,9 +251,9 @@ export default function SiteManagementPage() {
                 <div className="space-y-2">
                   <Label>Current Logo</Label>
                   <div className="flex items-center gap-4 p-3 bg-muted rounded-lg">
-                    <img 
-                      src={siteInfo.logo || "/placeholder.svg"} 
-                      alt="Site logo" 
+                    <img
+                      src={"/logo.png"}
+                      alt="Site logo"
                       className="h-12 w-12 object-contain"
                     />
                     <div>
@@ -298,32 +298,32 @@ export default function SiteManagementPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2">
             <div className="space-y-2">
               <h4 className="font-medium">Contact Information</h4>
               <p className="text-sm text-muted-foreground">
-                The contact information you provide here will be displayed on the 
+                The contact information you provide here will be displayed on the
                 public website. Make sure all details are accurate and up-to-date.
               </p>
             </div>
             <div className="space-y-2">
               <h4 className="font-medium">Social Media</h4>
               <p className="text-sm text-muted-foreground">
-                Social media links help visitors connect with you on different platforms. 
+                Social media links help visitors connect with you on different platforms.
                 Use full URLs including https:// for proper linking.
               </p>
             </div>
             <div className="space-y-2">
               <h4 className="font-medium">Logo Updates</h4>
               <p className="text-sm text-muted-foreground">
-                Logo changes require technical assistance. Contact your developer 
+                Logo changes require technical assistance. Contact your developer
                 if you need to update the site logo or branding elements.
               </p>
             </div>
             <div className="space-y-2">
               <h4 className="font-medium">Changes Effect</h4>
               <p className="text-sm text-muted-foreground">
-                Changes made here will be reflected on the public website immediately 
+                Changes made here will be reflected on the public website immediately
                 after saving. Review all information before submitting.
               </p>
             </div>

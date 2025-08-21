@@ -51,7 +51,7 @@ export default function TransactionsPage() {
 
       admin.transaction.transactionList({
         params,
-        onSuccess: (data) => {
+        onSuccess: (data: any) => {
           
           setTransactions(data.data || [])
           setCurrentPage(data.page_number || 1)
@@ -73,7 +73,7 @@ export default function TransactionsPage() {
           
           setLoading(false)
         },
-        onError: (error) => {
+        onError: (error: any) => {
           toast({
             title: "Error",
             description: "Failed to fetch transactions",
@@ -211,7 +211,7 @@ export default function TransactionsPage() {
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="h-32 bg-gray-200 rounded"></div>
             ))}
@@ -230,7 +230,7 @@ export default function TransactionsPage() {
       />
       
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {statsCards.map((stat, index) => (
           <Card key={index}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -238,7 +238,7 @@ export default function TransactionsPage() {
               <stat.icon className={`h-4 w-4 ${stat.color}`} />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
+              <div className="text-xl md:text-xl md:text-2xl font-bold">{stat.value}</div>
               <p className="text-xs text-muted-foreground">{stat.description}</p>
             </CardContent>
           </Card>
@@ -247,14 +247,14 @@ export default function TransactionsPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <div>
               <CardTitle>All Transactions ({totalItems})</CardTitle>
               <CardDescription>
                 Monitor payment transactions and their status
               </CardDescription>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:gap-2">
               <Button asChild variant="outline">
                 <Link href="/admin/transactions/refunds">
                   View Refunds
@@ -268,8 +268,8 @@ export default function TransactionsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <form onSubmit={handleSearch} className="flex items-center space-x-2 flex-1">
+          <div className="flex flex-col space-y-4 mb-6">
+            <form onSubmit={handleSearch} className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2">
               <div className="relative flex-1">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -279,39 +279,44 @@ export default function TransactionsPage() {
                   className="pl-8"
                 />
               </div>
-              <Button type="submit">
-                Search
-              </Button>
-              {searchTerm && (
-                <Button 
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setSearchTerm('')
-                    setStatusFilter('all')
-                    fetchTransactions(1, '', '')
-                  }}
-                >
-                  Clear
+              <div className="flex space-x-2">
+                <Button type="submit" className="flex-1 sm:flex-none">
+                  Search
                 </Button>
-              )}
+                {searchTerm && (
+                  <Button 
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setSearchTerm('')
+                      setStatusFilter('all')
+                      fetchTransactions(1, '', '')
+                    }}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
             </form>
-            <p className="text-xs text-muted-foreground mt-1">
-              Note: Search only works with transaction reference numbers (e.g., THECOURT_123...)
-            </p>
             
-            <Select value={statusFilter} onValueChange={handleStatusFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="successful">Successful</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="failed">Failed</SelectItem>
-                <SelectItem value="refunded">Refunded</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4">
+              <p className="text-xs text-muted-foreground">
+                Note: Search only works with transaction reference numbers (e.g., THECOURT_123...)
+              </p>
+              
+              <Select value={statusFilter} onValueChange={handleStatusFilter}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="successful">Successful</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="failed">Failed</SelectItem>
+                  <SelectItem value="refunded">Refunded</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           
           {/* Search Results Summary */}

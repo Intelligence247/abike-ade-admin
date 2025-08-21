@@ -166,7 +166,7 @@ export default function UserDetailsPage() {
     return (
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <div className="text-center">
-          <h2 className="text-2xl font-bold">User not found</h2>
+          <h2 className="text-xl md:text-2xl font-bold">User not found</h2>
           <p className="text-muted-foreground">The user you're looking for doesn't exist.</p>
           <Button onClick={() => router.back()} className="mt-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -184,7 +184,7 @@ export default function UserDetailsPage() {
         description="User details and transaction history"
       />
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -228,7 +228,7 @@ export default function UserDetailsPage() {
 
             <Separator />
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2">
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4 text-muted-foreground" />
@@ -270,23 +270,23 @@ export default function UserDetailsPage() {
                 Account Information
               </h4>
               <div className="grid gap-3 md:grid-cols-2 text-sm">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
                   <span className="font-medium">Account Status:</span>
                   <Badge variant={user.user.is_active ? 'default' : 'secondary'}>
                     {user.user.is_active ? 'Active' : 'Inactive'}
                   </Badge>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
                   <span className="font-medium">Verification Status:</span>
                   <Badge variant={user.verified ? 'default' : 'secondary'}>
                     {user.verified ? 'Verified' : 'Pending'}
                   </Badge>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
                   <span className="font-medium">Username:</span>
                   <span className="font-mono">@{user.user.username}</span>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
                   <span className="font-medium">User ID:</span>
                   <span className="font-mono">#{user.id}</span>
                 </div>
@@ -295,7 +295,7 @@ export default function UserDetailsPage() {
 
             {/* Verification Documents Section */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
                 <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
                   Verification Documents
                 </h4>
@@ -312,7 +312,7 @@ export default function UserDetailsPage() {
               
               {/* Agreement Document */}
               <div className="p-4 border rounded-lg">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-blue-100 rounded-lg">
                       <FileText className="h-5 w-5 text-blue-600" />
@@ -358,7 +358,7 @@ export default function UserDetailsPage() {
 
               {/* Identity Document */}
               <div className="p-4 border rounded-lg">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-green-100 rounded-lg">
                       <Shield className="h-5 w-5 text-green-600" />
@@ -404,7 +404,7 @@ export default function UserDetailsPage() {
 
               {/* Verification Status */}
               <div className="p-4 bg-muted rounded-lg">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg ${user.verified ? 'bg-green-100' : 'bg-yellow-100'}`}>
                       {user.verified ? (
@@ -495,19 +495,19 @@ export default function UserDetailsPage() {
             <div className="pt-3 border-t">
               <h4 className="text-sm font-medium mb-2">Document Status</h4>
               <div className="space-y-2 text-xs">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
                   <span>Agreement:</span>
                   <Badge variant={user.agreement ? 'default' : 'secondary'} className="text-xs">
                     {user.agreement ? 'Uploaded' : 'Missing'}
                   </Badge>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
                   <span>Identity:</span>
                   <Badge variant={user.identity ? 'default' : 'secondary'} className="text-xs">
                     {user.identity ? 'Uploaded' : 'Missing'}
                   </Badge>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
                   <span>Verification:</span>
                   <Badge variant={user.verified ? 'default' : 'secondary'} className="text-xs">
                     {user.verified ? 'Verified' : 'Pending'}

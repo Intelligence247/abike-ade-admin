@@ -161,7 +161,7 @@ export default function RoomDetailsPage() {
     return (
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <div className="text-center">
-          <h2 className="text-2xl font-bold">Room not found</h2>
+          <h2 className="text-xl md:text-2xl font-bold">Room not found</h2>
           <p className="text-muted-foreground">The room you're looking for doesn't exist.</p>
           <Button onClick={() => router.back()} className="mt-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -185,7 +185,7 @@ export default function RoomDetailsPage() {
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -216,14 +216,14 @@ export default function RoomDetailsPage() {
             <div className="space-y-4">
               <div>
                 <h3 className="text-xl font-semibold">{room.title}</h3>
-                <p className="text-2xl font-bold text-green-600 mt-1">
+                <p className="text-xl md:text-2xl font-bold text-green-600 mt-1">
                   ₦{parseFloat(room.price).toLocaleString()}
                 </p>
               </div>
 
               <Separator />
 
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2">
                 <div className="space-y-3">
                   <div>
                     <span className="text-sm font-medium">Room ID:</span>

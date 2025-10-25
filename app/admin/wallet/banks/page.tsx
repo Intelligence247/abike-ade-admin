@@ -24,12 +24,12 @@ export default function BankListPage() {
     setLoading(true)
     try {
       admin.wallet.bankList({
-        onSuccess: (data) => {
+        onSuccess: (data: any) => {
           setBanks(data.data || [])
           setFilteredBanks(data.data || [])
           setLoading(false)
         },
-        onError: (error) => {
+        onError: (_error: any) => {
           toast({
             title: "Error",
             description: "Failed to fetch bank list",

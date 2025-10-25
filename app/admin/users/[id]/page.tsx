@@ -197,7 +197,7 @@ export default function UserDetailsPage() {
               <div className="relative">
                 {user.image ? (
                   <img
-                    src={process.env.NEXT_PUBLIC_API_URL + "" + user.image}
+                    src={`${process.env.NEXT_PUBLIC_API_URL}${user.image}`}
                     alt={`${user.first_name} ${user.last_name}`}
                     className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
                   />

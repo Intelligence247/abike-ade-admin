@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAdmin } from '@/components/admin/admin-provider'
 import { useToast } from '@/components/ui/use-toast'
-import { Search, ArrowLeft, Plus, Send } from 'lucide-react'
+import { Search, ArrowLeft, Plus, Send, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import {
   Dialog,
@@ -22,6 +22,15 @@ import {
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue,
+  SelectLabel,
+  SelectGroup
+} from '@/components/ui/select'
 
 export default function RefundsPage() {
   const router = useRouter()
@@ -36,6 +45,11 @@ export default function RefundsPage() {
   const [initiateDialogOpen, setInitiateDialogOpen] = useState(false)
   const [transferDialogOpen, setTransferDialogOpen] = useState(false)
   const [selectedRefund, setSelectedRefund] = useState<any>(null)
+  const [transactions, setTransactions] = useState<any[]>([])
+  const [transactionsLoading, setTransactionsLoading] = useState(false)
+  const [banks, setBanks] = useState<any[]>([])
+  const [banksLoading, setBanksLoading] = useState(false)
+  const [verifyingAccount, setVerifyingAccount] = useState(false)
   const [refundForm, setRefundForm] = useState({
     reference: '',
     amount: '',
@@ -78,8 +92,87 @@ export default function RefundsPage() {
     }
   }
 
+  // Load transactions and banks when opening the initiate dialog
+  useEffect(() => {
+    if (!initiateDialogOpen || !admin) return
 
+    // Fetch recent transactions (first page, larger per_page for convenience)
+    setTransactionsLoading(true)
+    try {
+      admin.transaction.transactionList({
+        params: { per_page: 50, sort_by: '-date' },
+        onSuccess: (data: any) => {
+          setTransactions(Array.isArray(data.data) ? data.data : [])
+          setTransactionsLoading(false)
+        },
+        onError: () => {
+          setTransactions([])
+          setTransactionsLoading(false)
+        }
+      })
+    } catch {
+      setTransactionsLoading(false)
+    }
 
+    // Fetch bank list
+    setBanksLoading(true)
+    try {
+      admin.wallet.bankList({
+        onSuccess: (data: any) => {
+          setBanks(Array.isArray(data.data) ? data.data : [])
+          setBanksLoading(false)
+        },
+        onError: () => {
+          setBanks([])
+          setBanksLoading(false)
+        }
+      })
+    } catch {
+      setBanksLoading(false)
+    }
+  }, [initiateDialogOpen, admin])
+
+  // Auto-verify account name when bank_code and 10-digit account_number are present
+  useEffect(() => {
+    const acct = refundForm.account_number?.trim()
+    const bank = refundForm.bank_code?.trim()
+    if (!initiateDialogOpen || !admin || !bank || !acct || acct.length !== 10) return
+
+    setVerifyingAccount(true)
+    try {
+      admin.wallet.verifyAccount({
+        params: { account_number: acct, bank_code: bank },
+        onSuccess: (data: any) => {
+          const name = data?.data?.account_name || ''
+          setRefundForm(prev => ({ ...prev, account_name: name }))
+          setVerifyingAccount(false)
+        },
+        onError: (error: any) => {
+          setVerifyingAccount(false)
+          setRefundForm(prev => ({ ...prev, account_name: '' }))
+          toast({
+            title: 'Account verification failed',
+            description: error?.message || 'Could not verify account details',
+            variant: 'destructive',
+          })
+        }
+      })
+    } catch {
+      setVerifyingAccount(false)
+    }
+  }, [refundForm.account_number, refundForm.bank_code, initiateDialogOpen, admin, toast])
+
+  const handleSelectTransaction = (transactionId: string) => {
+    const tx = transactions.find((t) => String(t.id) === String(transactionId))
+    if (tx) {
+      // API requires the transaction reference
+      setRefundForm(prev => ({ ...prev, reference: tx.reference, amount: prev.amount || String(tx.amount || '') }))
+    }
+  }
+
+  const handleSelectBank = (bankCode: string) => {
+    setRefundForm(prev => ({ ...prev, bank_code: bankCode }))
+  }
   useEffect(() => {
     fetchRefunds()
   }, [])
@@ -429,14 +522,27 @@ export default function RefundsPage() {
                 </DialogHeader>
                 <form onSubmit={handleInitiateRefund} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="reference">Transaction Reference</Label>
-                    <Input
-                      id="reference"
-                      value={refundForm.reference}
-                      onChange={(e) => setRefundForm(prev => ({ ...prev, reference: e.target.value }))}
-                      placeholder="THECOURT_12345678909876543"
-                      required
-                    />
+                    <Label>Transaction</Label>
+                    <Select onValueChange={handleSelectTransaction}>
+                      <SelectTrigger>
+                        <SelectValue placeholder={transactionsLoading ? 'Loading transactions...' : (refundForm.reference ? 'Transaction selected' : 'Select transaction by student')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Recent Transactions</SelectLabel>
+                          {transactions.map((tx: any) => (
+                            <SelectItem key={tx.id} value={String(tx.id)}>
+                              {`${tx.student?.first_name || ''} ${tx.student?.last_name || ''}`.trim() || 'Unknown'}
+                              {tx.student?.email ? ` • ${tx.student.email}` : ''}
+                              {tx.reference ? ` • ${tx.reference}` : ''}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    {refundForm.reference && (
+                      <p className="text-xs text-muted-foreground">Selected reference: <span className="font-mono">{refundForm.reference}</span></p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="amount">Refund Amount (₦)</Label>
@@ -464,24 +570,41 @@ export default function RefundsPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="account_name">Account Name</Label>
-                    <Input
-                      id="account_name"
-                      value={refundForm.account_name}
-                      onChange={(e) => setRefundForm(prev => ({ ...prev, account_name: e.target.value }))}
-                      placeholder="JOHN DOE"
-                      required
-                    />
+                    <Label>Bank</Label>
+                    <Select onValueChange={handleSelectBank}>
+                      <SelectTrigger>
+                        <SelectValue placeholder={banksLoading ? 'Loading banks...' : (refundForm.bank_code ? 'Bank selected' : 'Select bank')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Banks</SelectLabel>
+                          {banks.map((b: any) => (
+                            <SelectItem key={b.bankCode} value={String(b.bankCode)}>
+                              {b.bankName}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    {refundForm.bank_code && (
+                      <p className="text-xs text-muted-foreground">Selected bank code: {refundForm.bank_code}</p>
+                    )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="bank_code">Bank Code</Label>
-                    <Input
-                      id="bank_code"
-                      value={refundForm.bank_code}
-                      onChange={(e) => setRefundForm(prev => ({ ...prev, bank_code: e.target.value }))}
-                      placeholder="999992"
-                      required
-                    />
+                    <Label htmlFor="account_name">Account Name</Label>
+                    <div className="relative">
+                      <Input
+                        id="account_name"
+                        value={refundForm.account_name}
+                        placeholder={verifyingAccount ? 'Verifying...' : 'Auto-filled after verification'}
+                        readOnly
+                        required
+                      />
+                      {verifyingAccount && (
+                        <Loader2 className="absolute right-2 top-2 h-5 w-5 animate-spin text-muted-foreground" />
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">Account name is auto-filled after verifying the account number and bank.</p>
                   </div>
                   <DialogFooter>
                     <Button type="button" variant="outline" onClick={() => setInitiateDialogOpen(false)}>

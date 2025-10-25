@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAdmin } from '@/components/admin/admin-provider'
 import { useToast } from '@/components/ui/use-toast'
-import { Search, Plus, Eye, Edit, Trash2, Users, Building } from 'lucide-react'
+import { Search, Plus, Eye, Edit, Trash2, Users, Building, UserMinus } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
@@ -53,14 +53,14 @@ export default function RoomsPage() {
           search,
           sort_by: 'title'
         },
-        onSuccess: (data) => {
+        onSuccess: (data: any) => {
           setRooms(data.data || [])
           setCurrentPage(data.page_number || 1)
           setTotalPages(data.total_pages || 1)
           setTotalItems(data.total_items || 0)
           setLoading(false)
         },
-        onError: (error) => {
+        onError: (error: any) => {
           toast({
             title: "Error",
             description: "Failed to fetch rooms",
@@ -98,10 +98,39 @@ export default function RoomsPage() {
           })
           fetchRooms(currentPage, searchTerm)
         },
-        onError: (error) => {
+        onError: (error: any) => {
           toast({
             title: "Error",
             description: error.message || "Failed to delete room",
+            variant: "destructive",
+          })
+        }
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleTerminateRoom = async (roomId: number) => {
+    try {
+      admin.room.terminateRoom({
+        formData: { room_id: roomId },
+        onSuccess: (data: any) => {
+          toast({
+            title: "Success",
+            description: data?.message || "Room occupancy terminated successfully",
+          })
+          fetchRooms(currentPage, searchTerm)
+        },
+        onError: (error: any) => {
+          let description = error?.message || "Failed to terminate occupancy"
+          toast({
+            title: "Error",
+            description,
             variant: "destructive",
           })
         }
@@ -159,6 +188,31 @@ export default function RoomsPage() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+            {!room.available && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <UserMinus className="mr-2 h-4 w-4" />
+                    Terminate Occupancy
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Terminate Room Occupancy?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will end the current occupant's stay for "{room.title}" immediately.
+                      Are you sure you want to proceed?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => handleTerminateRoom(room.id)}>
+                      Terminate
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
@@ -262,6 +316,31 @@ export default function RoomsPage() {
                 Edit Room
               </Link>
             </DropdownMenuItem>
+            {!room.available && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <UserMinus className="mr-2 h-4 w-4" />
+                    Terminate Occupancy
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Terminate Room Occupancy?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will end the current occupant's stay for "{room.title}" immediately.
+                      Are you sure you want to proceed?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => handleTerminateRoom(room.id)}>
+                      Terminate
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
             <DropdownMenuSeparator />
             <AlertDialog>
               <AlertDialogTrigger asChild>

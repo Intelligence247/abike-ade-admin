@@ -31,6 +31,7 @@ declare module 'abikeade-sdk' {
       updateRoom(options: { formData: any; onSuccess: (data: any) => void; onError: (error: any) => void }): void;
       updateRoomImage(options: { formData: FormData; onSuccess: (data: any) => void; onError: (error: any) => void }): void;
       assignRoom(options: { formData: any; onSuccess: (data: any) => void; onError: (error: any) => void }): void;
+      terminateRoom(options: { formData: { room_id: number }; onSuccess: (data: any) => void; onError: (error: any) => void }): void;
       deleteRoom(options: { formData: any; onSuccess: (data: any) => void; onError: (error: any) => void }): void;
       updateRoomGallery(options: { formData: any; onSuccess: (data: any) => void; onError: (error: any) => void }): void;
     };

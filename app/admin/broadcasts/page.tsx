@@ -259,38 +259,40 @@ export default function BroadcastsPage() {
                     Send a message to all registered users
                   </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleCreateBroadcast} className="space-y-4 flex-1 overflow-y-auto min-h-0">
-                  <div className="space-y-2">
-                    <Label htmlFor="subject">Subject</Label>
-                    <Input
-                      id="subject"
-                      value={broadcastForm.subject}
-                      onChange={(e) => setBroadcastForm(prev => ({ ...prev, subject: e.target.value }))}
-                      placeholder="Enter broadcast subject..."
-                      required
-                    />
+                <form onSubmit={handleCreateBroadcast} className="flex flex-col flex-1 min-h-0">
+                  <div className="space-y-4 flex-1 overflow-y-auto min-h-0">
+                    <div className="space-y-2">
+                      <Label htmlFor="subject">Subject</Label>
+                      <Input
+                        id="subject"
+                        value={broadcastForm.subject}
+                        onChange={(e) => setBroadcastForm(prev => ({ ...prev, subject: e.target.value }))}
+                        placeholder="Enter broadcast subject..."
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="message">Message</Label>
+                      <RichTextEditor
+                        value={broadcastForm.message}
+                        onChange={(content) => setBroadcastForm(prev => ({ ...prev, message: content }))}
+                        placeholder="Enter your message here..."
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Rich text formatting is supported (bold, italic, colors, etc.)
+                      </p>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="message">Message</Label>
-                    <RichTextEditor
-                      value={broadcastForm.message}
-                      onChange={(content) => setBroadcastForm(prev => ({ ...prev, message: content }))}
-                      placeholder="Enter your message here..."
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Rich text formatting is supported (bold, italic, colors, etc.)
-                    </p>
-                  </div>
+                  <DialogFooter className="flex-shrink-0 pt-4 border-t mt-4">
+                    <Button type="button" variant="outline" onClick={() => setCreateDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" disabled={!broadcastForm.subject.trim() || !hasTextContent(broadcastForm.message)}>
+                      <Send className="mr-2 h-4 w-4" />
+                      Send Broadcast
+                    </Button>
+                  </DialogFooter>
                 </form>
-                <DialogFooter className="flex-shrink-0 pt-4 border-t">
-                  <Button type="button" variant="outline" onClick={() => setCreateDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={!broadcastForm.subject.trim() || !hasTextContent(broadcastForm.message)}>
-                    <Send className="mr-2 h-4 w-4" />
-                    Send Broadcast
-                  </Button>
-                </DialogFooter>
               </DialogContent>
             </Dialog>
           </div>

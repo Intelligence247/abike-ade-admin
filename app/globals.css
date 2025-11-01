@@ -189,3 +189,90 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* RichTextEditor (ReactQuill) Styles */
+.rich-text-editor-wrapper .ql-container {
+  font-family: inherit;
+  font-size: 0.875rem;
+  border: 1px solid hsl(var(--input));
+  border-radius: calc(var(--radius) - 2px);
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  min-height: 200px;
+}
+
+.rich-text-editor-wrapper .ql-container:focus-within {
+  border-color: hsl(var(--ring));
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+}
+
+.rich-text-editor-wrapper .ql-toolbar {
+  border: 1px solid hsl(var(--input));
+  border-bottom: none;
+  border-radius: calc(var(--radius) - 2px) calc(var(--radius) - 2px) 0 0;
+  background-color: hsl(var(--background));
+  padding: 8px;
+}
+
+.rich-text-editor-wrapper .ql-toolbar .ql-stroke {
+  stroke: hsl(var(--foreground));
+}
+
+.rich-text-editor-wrapper .ql-toolbar .ql-fill {
+  fill: hsl(var(--foreground));
+}
+
+.rich-text-editor-wrapper .ql-toolbar button:hover,
+.rich-text-editor-wrapper .ql-toolbar button:focus {
+  color: hsl(var(--ring));
+}
+
+.rich-text-editor-wrapper .ql-toolbar button:hover .ql-stroke,
+.rich-text-editor-wrapper .ql-toolbar button:focus .ql-stroke {
+  stroke: hsl(var(--ring));
+}
+
+.rich-text-editor-wrapper .ql-toolbar button:hover .ql-fill,
+.rich-text-editor-wrapper .ql-toolbar button:focus .ql-fill {
+  fill: hsl(var(--ring));
+}
+
+.rich-text-editor-wrapper .ql-toolbar button.ql-active .ql-stroke {
+  stroke: hsl(var(--ring));
+}
+
+.rich-text-editor-wrapper .ql-toolbar button.ql-active .ql-fill {
+  fill: hsl(var(--ring));
+}
+
+.rich-text-editor-wrapper .ql-editor {
+  min-height: 200px;
+  padding: 12px;
+}
+
+.rich-text-editor-wrapper .ql-editor.ql-blank::before {
+  color: hsl(var(--muted-foreground));
+  font-style: normal;
+}
+
+.rich-text-editor-wrapper .ql-snow .ql-picker {
+  color: hsl(var(--foreground));
+}
+
+.rich-text-editor-wrapper .ql-snow .ql-picker-options {
+  background-color: hsl(var(--popover));
+  border: 1px solid hsl(var(--border));
+  border-radius: calc(var(--radius) - 2px);
+}
+
+.rich-text-editor-wrapper .ql-snow .ql-picker-item:hover {
+  background-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
+
+.rich-text-editor-wrapper .ql-snow .ql-picker-item.ql-selected {
+  background-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}

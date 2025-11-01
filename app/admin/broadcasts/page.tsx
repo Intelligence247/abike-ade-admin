@@ -19,8 +19,8 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { formatDistanceToNow } from 'date-fns'
+import RichTextEditor from '@/components/admin/rich-text-editor'
 
 export default function BroadcastsPage() {
   const { admin, isLoading: adminLoading } = useAdmin()
@@ -81,9 +81,24 @@ export default function BroadcastsPage() {
     fetchBroadcasts(1, searchTerm)
   }
 
+  // Helper function to check if HTML content has actual text
+  const hasTextContent = (html: string): boolean => {
+    if (!html) return false
+    // Strip HTML tags and check if there's actual text content
+    const textContent = html.replace(/<[^>]*>/g, '').trim()
+    return textContent.length > 0
+  }
+
   const handleCreateBroadcast = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!broadcastForm.subject.trim() || !broadcastForm.message.trim()) return
+    if (!broadcastForm.subject.trim() || !hasTextContent(broadcastForm.message)) {
+      toast({
+        title: "Error",
+        description: "Please fill in both subject and message.",
+        variant: "destructive",
+      })
+      return
+    }
 
     try {
       admin.broadcast.send({
@@ -257,23 +272,20 @@ export default function BroadcastsPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="message">Message</Label>
-                    <Textarea
-                      id="message"
+                    <RichTextEditor
                       value={broadcastForm.message}
-                      onChange={(e) => setBroadcastForm(prev => ({ ...prev, message: e.target.value }))}
+                      onChange={(content) => setBroadcastForm(prev => ({ ...prev, message: content }))}
                       placeholder="Enter your message here..."
-                      rows={8}
-                      required
                     />
                     <p className="text-xs text-muted-foreground">
-                      HTML formatting is supported
+                      Rich text formatting is supported (bold, italic, colors, etc.)
                     </p>
                   </div>
                   <DialogFooter>
                     <Button type="button" variant="outline" onClick={() => setCreateDialogOpen(false)}>
                       Cancel
                     </Button>
-                    <Button type="submit" disabled={!broadcastForm.subject.trim() || !broadcastForm.message.trim()}>
+                    <Button type="submit" disabled={!broadcastForm.subject.trim() || !hasTextContent(broadcastForm.message)}>
                       <Send className="mr-2 h-4 w-4" />
                       Send Broadcast
                     </Button>

@@ -16,7 +16,7 @@ export function PageHeader({ title, description, children }: PageHeaderProps) {
   // Generate breadcrumbs from pathname
   const generateBreadcrumbs = () => {
     const segments = pathname.split('/').filter(Boolean)
-    const breadcrumbs = [
+    const breadcrumbs: Array<{ name: string; href: string; icon?: typeof Home }> = [
       { name: 'Dashboard', href: '/admin', icon: Home }
     ]
     
@@ -43,8 +43,7 @@ export function PageHeader({ title, description, children }: PageHeaderProps) {
       
       breadcrumbs.push({
         name,
-        href: currentPath,
-        icon: undefined
+        href: currentPath
       })
     })
     

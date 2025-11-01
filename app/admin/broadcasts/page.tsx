@@ -252,14 +252,14 @@ export default function BroadcastsPage() {
                   New Broadcast
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px]">
-                <DialogHeader>
+              <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
+                <DialogHeader className="flex-shrink-0">
                   <DialogTitle>Create New Broadcast</DialogTitle>
                   <DialogDescription>
                     Send a message to all registered users
                   </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleCreateBroadcast} className="space-y-4">
+                <form onSubmit={handleCreateBroadcast} className="space-y-4 flex-1 overflow-y-auto min-h-0">
                   <div className="space-y-2">
                     <Label htmlFor="subject">Subject</Label>
                     <Input
@@ -281,16 +281,16 @@ export default function BroadcastsPage() {
                       Rich text formatting is supported (bold, italic, colors, etc.)
                     </p>
                   </div>
-                  <DialogFooter>
-                    <Button type="button" variant="outline" onClick={() => setCreateDialogOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" disabled={!broadcastForm.subject.trim() || !hasTextContent(broadcastForm.message)}>
-                      <Send className="mr-2 h-4 w-4" />
-                      Send Broadcast
-                    </Button>
-                  </DialogFooter>
                 </form>
+                <DialogFooter className="flex-shrink-0 pt-4 border-t">
+                  <Button type="button" variant="outline" onClick={() => setCreateDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={!broadcastForm.subject.trim() || !hasTextContent(broadcastForm.message)}>
+                    <Send className="mr-2 h-4 w-4" />
+                    Send Broadcast
+                  </Button>
+                </DialogFooter>
               </DialogContent>
             </Dialog>
           </div>

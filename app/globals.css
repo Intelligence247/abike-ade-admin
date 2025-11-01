@@ -191,6 +191,12 @@
 }
 
 /* RichTextEditor (ReactQuill) Styles */
+.rich-text-editor-wrapper {
+  display: flex;
+  flex-direction: column;
+  max-height: 400px;
+}
+
 .rich-text-editor-wrapper .ql-container {
   font-family: inherit;
   font-size: 0.875rem;
@@ -199,6 +205,10 @@
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
   min-height: 200px;
+  max-height: 350px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .rich-text-editor-wrapper .ql-container:focus-within {
@@ -249,7 +259,10 @@
 
 .rich-text-editor-wrapper .ql-editor {
   min-height: 200px;
+  max-height: 300px;
   padding: 12px;
+  overflow-y: auto;
+  flex: 1;
 }
 
 .rich-text-editor-wrapper .ql-editor.ql-blank::before {
